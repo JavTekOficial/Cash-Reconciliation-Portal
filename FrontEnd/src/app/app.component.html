@@ -367,6 +367,125 @@
         </table>
       </div>
     </section>
+
+    <!-- ======================================================== -->
+    <!-- FILTERED DASHBOARD SUMMARY (Calculado según filtros)    -->
+    <!-- ======================================================== -->
+    <section class="filtered-summary-section card-container" aria-labelledby="filtered-summary-title">
+      <div class="filtered-summary-header">
+        <div class="filtered-summary-title-wrap">
+          <div class="summary-icon-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+          </div>
+          <div>
+            <h2 id="filtered-summary-title" class="section-title">
+              {{ 'FILTERED_SUMMARY_TITLE' | translate }}
+            </h2>
+            <p class="section-subtitle">
+              {{ 'FILTERED_SUMMARY_SUBTITLE' | translate }}
+            </p>
+          </div>
+        </div>
+
+        <div class="filtered-status-indicator" [class.has-filters]="hasActiveFilters()">
+          <span class="indicator-dot"></span>
+          <span>{{ (hasActiveFilters() ? 'FILTERS_ACTIVE' : 'ALL_RECORDS') | translate }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <!-- Filtered KPI 1: Total Filtrado -->
+        <div class="kpi-card card-total">
+          <div class="kpi-icon-wrapper icon-total">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+            </svg>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">{{ 'TOTAL_DEPOSITS' | translate }} ({{ 'RESULTS' | translate }})</span>
+            <span class="kpi-value">{{ filteredSummary().totalDeposits }}</span>
+            <span class="kpi-meta">
+              {{ 'TOTAL_EXPECTED' | translate }}: {{ filteredSummary().totalExpectedAmount | currency:'USD':'symbol':'1.2-2' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Filtered KPI 2: Conciliados Filtrados -->
+        <div class="kpi-card card-reconciled">
+          <div class="kpi-icon-wrapper icon-reconciled">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">{{ 'RECONCILED_DEPOSITS' | translate }}</span>
+            <span class="kpi-value text-reconciled">{{ filteredSummary().reconciledCount }}</span>
+            <span class="kpi-meta">
+              {{ filteredSummary().pendingCount }} {{ 'PENDING_DEPOSITS' | translate | lowercase }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Filtered KPI 3: Faltantes Filtrados -->
+        <div class="kpi-card card-short">
+          <div class="kpi-icon-wrapper icon-short">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
+              <polyline points="17 18 23 18 23 12" />
+            </svg>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">{{ 'SHORT_DEPOSITS' | translate }}</span>
+            <span class="kpi-value text-short">{{ filteredSummary().shortCount }}</span>
+            <span class="kpi-meta text-muted">Diferencia &lt; 0</span>
+          </div>
+        </div>
+
+        <!-- Filtered KPI 4: Sobrantes Filtrados -->
+        <div class="kpi-card card-over">
+          <div class="kpi-icon-wrapper icon-over">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
+            </svg>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">{{ 'OVER_DEPOSITS' | translate }}</span>
+            <span class="kpi-value text-over">{{ filteredSummary().overCount }}</span>
+            <span class="kpi-meta text-muted">Diferencia &gt; 0</span>
+          </div>
+        </div>
+
+        <!-- Filtered KPI 5: Total Varianza Filtrada -->
+        <div class="kpi-card card-variance">
+          <div class="kpi-icon-wrapper icon-variance">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">{{ 'TOTAL_VARIANCE' | translate }}</span>
+            <span class="kpi-value" [ngClass]="{
+                'text-short': filteredSummary().totalVariance < 0,
+                'text-over': filteredSummary().totalVariance > 0,
+                'text-reconciled': filteredSummary().totalVariance === 0
+              }">
+              {{ filteredSummary().totalVariance >= 0 ? '+' : '' }}{{ filteredSummary().totalVariance |
+              currency:'USD':'symbol':'1.2-2' }}
+            </span>
+            <span class="kpi-meta">
+              {{ 'TOTAL_ACTUAL' | translate }}: {{ filteredSummary().totalActualAmount | currency:'USD':'symbol':'1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- ======================================================== -->

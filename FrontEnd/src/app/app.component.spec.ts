@@ -196,5 +196,13 @@ describe('AppComponent', () => {
       expect(component.filterEndDate).toBe('');
       expect(depositServiceMock.getDeposits).toHaveBeenCalled();
     });
+
+    it('should set hasActiveFilters to true and request filtered summary when filters applied', () => {
+      component.filterStatus = 'Short';
+      component.applyFilters();
+
+      expect(component.hasActiveFilters()).toBeTrue();
+      expect(dashboardServiceMock.getSummary).toHaveBeenCalledWith(jasmine.objectContaining({ status: 'Short' }));
+    });
   });
 });

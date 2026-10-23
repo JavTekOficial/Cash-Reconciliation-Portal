@@ -29,6 +29,20 @@ export class AppComponent implements OnInit {
     totalActualAmount: 0
   });
 
+  // Filtered Results Summary Signal (bottom of page)
+  readonly filteredSummary = signal<DashboardSummary>({
+    totalDeposits: 0,
+    pendingCount: 0,
+    reconciledCount: 0,
+    shortCount: 0,
+    overCount: 0,
+    totalVariance: 0,
+    totalExpectedAmount: 0,
+    totalActualAmount: 0
+  });
+
+  readonly hasActiveFilters = signal<boolean>(false);
+
   readonly isLoading = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
@@ -109,6 +123,11 @@ export class AppComponent implements OnInit {
     if (this.filterStartDate) filters.startDate = this.filterStartDate;
     if (this.filterEndDate) filters.endDate = this.filterEndDate;
 
+    const hasFilters = Boolean(
+      filters.depositNumber || filters.storeNumber || filters.status || filters.startDate || filters.endDate
+    );
+    this.hasActiveFilters.set(hasFilters);
+
     // Load deposits
     this.depositService.getDeposits(filters).subscribe({
       next: (data) => {
@@ -122,13 +141,23 @@ export class AppComponent implements OnInit {
       }
     });
 
-    // Load dashboard metrics
+    // Load general dashboard metrics (overall vault totals for top cards)
     this.dashboardService.getSummary().subscribe({
       next: (summary) => {
         this.dashboard.set(summary);
       },
       error: (err) => {
-        console.error('Error fetching dashboard', err);
+        console.error('Error fetching general dashboard', err);
+      }
+    });
+
+    // Load filtered summary metrics (dynamic totals for bottom cards based on filters)
+    this.dashboardService.getSummary(filters).subscribe({
+      next: (summary) => {
+        this.filteredSummary.set(summary);
+      },
+      error: (err) => {
+        console.error('Error fetching filtered summary', err);
       }
     });
   }

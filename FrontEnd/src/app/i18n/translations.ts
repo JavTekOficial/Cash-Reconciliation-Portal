@@ -23,6 +23,10 @@ export const TRANSLATIONS: Record<SupportedLang, Record<string, string>> = {
     'TOTAL_ACTUAL': 'Monto Real Contado',
     'COUNTED': 'Contados',
     'OF_TOTAL': 'de',
+    'FILTERED_SUMMARY_TITLE': 'Resumen de la Búsqueda y Filtros',
+    'FILTERED_SUMMARY_SUBTITLE': 'Métricas y totales calculados dinámicamente según los criterios aplicados',
+    'FILTERS_ACTIVE': 'Filtros aplicados',
+    'ALL_RECORDS': 'Todos los registros',
 
     // Search & Filters
     'SEARCH_FILTERS': 'Búsqueda y Filtros',
@@ -115,6 +119,10 @@ export const TRANSLATIONS: Record<SupportedLang, Record<string, string>> = {
     'TOTAL_ACTUAL': 'Total Counted Amount',
     'COUNTED': 'Counted',
     'OF_TOTAL': 'of',
+    'FILTERED_SUMMARY_TITLE': 'Search & Filtered Results Summary',
+    'FILTERED_SUMMARY_SUBTITLE': 'Metrics and totals calculated dynamically according to applied criteria',
+    'FILTERS_ACTIVE': 'Filters applied',
+    'ALL_RECORDS': 'All records',
 
     // Search & Filters
     'SEARCH_FILTERS': 'Search & Filters',
