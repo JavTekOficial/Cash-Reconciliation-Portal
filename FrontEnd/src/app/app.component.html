@@ -192,49 +192,51 @@
         </div>
       </div>
 
-      <form class="filters-grid" (ngSubmit)="applyFilters()">
-        <!-- Deposit Number -->
-        <div class="filter-field">
-          <label for="filter-deposit-no">{{ 'DEPOSIT_NUMBER' | translate }}</label>
-          <input type="text" id="filter-deposit-no" name="filterDepositNumber" [(ngModel)]="filterDepositNumber"
-            placeholder="ej. DEP1001" class="input-control">
+      <form class="filters-form" (ngSubmit)="applyFilters()">
+        <div class="filters-grid">
+          <!-- Deposit Number -->
+          <div class="filter-field">
+            <label for="filter-deposit-no">{{ 'DEPOSIT_NUMBER' | translate }}</label>
+            <input type="text" id="filter-deposit-no" name="filterDepositNumber" [(ngModel)]="filterDepositNumber"
+              placeholder="ej. DEP1001" class="input-control">
+          </div>
+
+          <!-- Store Number -->
+          <div class="filter-field">
+            <label for="filter-store-no">{{ 'STORE_NUMBER' | translate }}</label>
+            <input type="text" id="filter-store-no" name="filterStoreNumber" [(ngModel)]="filterStoreNumber"
+              placeholder="ej. ST001" class="input-control">
+          </div>
+
+          <!-- Status -->
+          <div class="filter-field">
+            <label for="filter-status">{{ 'STATUS' | translate }}</label>
+            <select id="filter-status" name="filterStatus" [(ngModel)]="filterStatus"
+              class="input-control select-control">
+              <option value="">{{ 'ALL_STATUSES' | translate }}</option>
+              <option value="Pending">{{ 'STATUS_PENDING' | translate }}</option>
+              <option value="Reconciled">{{ 'STATUS_RECONCILED' | translate }}</option>
+              <option value="Over">{{ 'STATUS_OVER' | translate }}</option>
+              <option value="Short">{{ 'STATUS_SHORT' | translate }}</option>
+            </select>
+          </div>
+
+          <!-- Date From -->
+          <div class="filter-field">
+            <label for="filter-start-date">{{ 'DATE_FROM' | translate }}</label>
+            <input type="date" id="filter-start-date" name="filterStartDate" [(ngModel)]="filterStartDate"
+              class="input-control">
+          </div>
+
+          <!-- Date To -->
+          <div class="filter-field">
+            <label for="filter-end-date">{{ 'DATE_TO' | translate }}</label>
+            <input type="date" id="filter-end-date" name="filterEndDate" [(ngModel)]="filterEndDate"
+              class="input-control">
+          </div>
         </div>
 
-        <!-- Store Number -->
-        <div class="filter-field">
-          <label for="filter-store-no">{{ 'STORE_NUMBER' | translate }}</label>
-          <input type="text" id="filter-store-no" name="filterStoreNumber" [(ngModel)]="filterStoreNumber"
-            placeholder="ej. ST001" class="input-control">
-        </div>
-
-        <!-- Status -->
-        <div class="filter-field">
-          <label for="filter-status">{{ 'STATUS' | translate }}</label>
-          <select id="filter-status" name="filterStatus" [(ngModel)]="filterStatus"
-            class="input-control select-control">
-            <option value="">{{ 'ALL_STATUSES' | translate }}</option>
-            <option value="Pending">{{ 'STATUS_PENDING' | translate }}</option>
-            <option value="Reconciled">{{ 'STATUS_RECONCILED' | translate }}</option>
-            <option value="Over">{{ 'STATUS_OVER' | translate }}</option>
-            <option value="Short">{{ 'STATUS_SHORT' | translate }}</option>
-          </select>
-        </div>
-
-        <!-- Date From -->
-        <div class="filter-field">
-          <label for="filter-start-date">{{ 'DATE_FROM' | translate }}</label>
-          <input type="date" id="filter-start-date" name="filterStartDate" [(ngModel)]="filterStartDate"
-            class="input-control">
-        </div>
-
-        <!-- Date To -->
-        <div class="filter-field">
-          <label for="filter-end-date">{{ 'DATE_TO' | translate }}</label>
-          <input type="date" id="filter-end-date" name="filterEndDate" [(ngModel)]="filterEndDate"
-            class="input-control">
-        </div>
-
-        <!-- Buttons -->
+        <!-- Buttons Row (Siempre abajo en renglón separado) -->
         <div class="filter-actions">
           <button type="submit" class="btn-primary btn-search" id="btn-search-deposits">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">

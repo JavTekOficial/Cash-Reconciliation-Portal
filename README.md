@@ -1,76 +1,88 @@
-# Cash Reconciliation Portal (Portal de Conciliación de Efectivo)
+<p align="right">
+  🇺🇸 English | <a href="README.es.md">🇪🇸 Español</a>
+</p>
 
-Sistema integral de nivel empresarial para la gestión, recepción y conciliación de bolsas de depósito de efectivo provenientes de tiendas en una bóveda central. Desarrollado con una arquitectura desacoplada y moderna que incluye **ASP.NET Core Web API (.NET 8)**, **Entity Framework Core 8**, **SQL Server** y un cliente web en **Angular 19** con soporte nativo multilingüe (**Español** e **Inglés**).
+# Cash Reconciliation Portal
 
----
-
-## Tabla de Contenidos
-
-1. [Descripción General y Objetivos](#descripción-general-y-objetivos)
-2. [Stack Tecnológico](#stack-tecnológico)
-3. [Arquitectura del Sistema](#arquitectura-del-sistema)
-4. [Reglas de Negocio](#reglas-de-negocio)
-5. [Requisitos Previos](#requisitos-previos)
-6. [Instalación y Configuración](#instalación-y-configuración)
-   - [Configuración de la Base de Datos](#1-configuración-de-la-base-de-datos)
-   - [Ejecución del Backend (.NET 8 API)](#2-ejecución-del-backend-net-8-api)
-   - [Ejecución del Frontend (Angular 19)](#3-ejecución-del-frontend-angular-19)
-7. [Documentación de la API REST](#documentación-de-la-api-rest)
-8. [Ejecución de Pruebas Automatizadas](#ejecución-de-pruebas-automatizadas)
-9. [Internacionalización y Soporte Multilingüe](#internacionalización-y-soporte-multilingüe-i18n)
-10. [Estructura del Proyecto](#estructura-del-proyecto)
-11. [Historial de Commits en Git](#historial-de-commits-en-git)
+> 🚀 **Live / Online Demo**: You can run and test the application directly online at:  
+> **[https://javtekoficial.github.io/Cash-Reconciliation-Portal/](https://javtekoficial.github.io/Cash-Reconciliation-Portal/)**
 
 ---
 
-## Descripción General y Objetivos
-
-El portal resuelve la necesidad operativa de control y auditoría de ingresos de efectivo en bóvedas centrales:
-* **Recepción y Registro**: Captura de depósitos con número único de bolsa, número de tienda, monto esperado declarado y fecha.
-* **Conteo y Conciliación**: Ingreso del conteo físico real con cálculo dinámico en vivo de la varianza antes del guardado.
-* **Auditoría Automatizada**: Clasificación inmediata en estados *Conciliado*, *Sobrante* o *Faltante* según la diferencia detectada.
-* **Panel de Control (Dashboard)**: Métricas consolidadas en tiempo real (total de depósitos, pendientes, conciliados, faltantes, sobrantes y varianza acumulada).
-* **Búsqueda Avanzada y Filtros**: Búsqueda por número de depósito, número de tienda, estado y rango de fechas.
-* **Experiencia de Usuario Premium**: Interfaz moderna en tema claro (*light theme*) con *glassmorphism*, micro-animaciones, diseño completamente responsivo y cambio de idioma en caliente (ES/EN).
+Enterprise-grade end-to-end system for managing, receiving, and reconciling store cash deposit bags at a central vault. Built with a decoupled, modern architecture featuring **ASP.NET Core Web API (.NET 8)**, **Entity Framework Core 8**, **SQL Server**, and an **Angular 19** web client with native multilingual support (**English** and **Spanish**).
 
 ---
 
-## Stack Tecnológico
+## Table of Contents
 
-| Capa | Tecnología | Versión | Propósito |
+1. [Overview & Objectives](#overview--objectives)
+2. [Tech Stack](#tech-stack)
+3. [System Architecture](#system-architecture)
+4. [Business Rules](#business-rules)
+5. [Prerequisites](#prerequisites)
+6. [Installation & Setup](#installation--setup)
+   - [1. Database Configuration](#1-database-configuration)
+   - [2. Running the Backend (.NET 8 API)](#2-running-the-backend-net-8-api)
+   - [3. Running the Frontend (Angular 19)](#3-running-the-frontend-angular-19)
+7. [REST API Documentation](#rest-api-documentation)
+8. [Automated Testing](#automated-testing)
+9. [Internationalization & Multilingual Support (i18n)](#internationalization--multilingual-support-i18n)
+10. [Project Structure](#project-structure)
+11. [Git Commit History](#git-commit-history)
+
+---
+
+## Overview & Objectives
+
+The portal addresses the operational need for cash intake control, verification, and auditability at central vaults:
+* **Receipt & Registration**: Capture deposits with a unique bag/deposit number, store number, declared expected amount, and deposit date.
+* **Counting & Reconciliation**: Input actual physical cash count with dynamic live variance calculation before submission.
+* **Automated Audit**: Immediate classification into *Reconciled*, *Over*, or *Short* statuses based on detected differences.
+* **Control Dashboard**: Consolidated real-time metrics (total deposits, pending, reconciled, short, over, and cumulative variance balance).
+* **Advanced Search & Filters**: Search by deposit number, store number, status, and date range.
+* **Server-Side Pagination**: Efficient database-level data segmentation with custom page sizing and navigation metadata.
+* **Audit Trail**: Complete lifecycle traceability recording created, reconciled, and re-reconciled events with previous vs. new values, operator, and UTC timestamps.
+* **CSV Export**: Server-side RFC 4180 compliant CSV export with active filters and UTF-8 BOM encoding for seamless Microsoft Excel compatibility.
+* **Premium User Experience**: Modern light-theme interface with glassmorphism, micro-animations, fully responsive layout, and on-the-fly language switching (ES/EN).
+
+---
+
+## Tech Stack
+
+| Layer | Technology | Version | Purpose |
 | :--- | :--- | :--- | :--- |
-| **Backend API** | ASP.NET Core Web API | .NET 8 | API REST con controladores tradicionales e inyección de dependencias |
-| **ORM / Datos** | Entity Framework Core | 8.0.11 | Acceso a datos relacionales, migraciones y Fluent API |
-| **Base de Datos** | Microsoft SQL Server / Express | 2019/2022 | Almacén relacional con restricciones e índices optimizados |
-| **Documentación API** | Swagger / OpenAPI | Swashbuckle 6.6.2 | Especificación interactiva de endpoints |
-| **Frontend Web** | Angular | 19.1 | SPA con Standalone Components, Signals y Reactive Forms |
-| **Estilos** | CSS3 Moderno | Custom tokens | Variables CSS, Glassmorphism, tema claro (*light theme*) y animaciones fluidas |
-| **Testing Backend** | xUnit & Moq | 2.9 / 4.21 | Pruebas unitarias de servicios de negocio y lógica de conciliación |
-| **Testing Frontend** | Jasmine & Karma | 5.5 / 6.4 | Pruebas unitarias de componentes, reactividad y traducciones |
+| **Backend API** | ASP.NET Core Web API | .NET 8 | REST API with controllers and dependency injection |
+| **ORM / Data** | Entity Framework Core | 8.0.11 | Relational data access, migrations, and Fluent API mapping |
+| **Database** | Microsoft SQL Server / Express | 2019/2022 | Relational store with constraints and optimized indexes |
+| **API Documentation** | Swagger / OpenAPI | Swashbuckle 6.6.2 | Interactive endpoint specification and testing |
+| **Web Frontend** | Angular | 19.1 | SPA with Standalone Components, Signals, and Reactive Forms |
+| **Styling** | Modern CSS3 | Custom tokens | CSS variables, Glassmorphism, light theme, and fluid micro-animations |
+| **Backend Testing** | xUnit & Moq | 2.9 / 4.21 | Unit testing for business services, audit logging, and reconciliation rules |
+| **Frontend Testing** | Jasmine & Karma | 5.5 / 6.4 | Unit testing for components, reactivity, modals, and translations |
 
 ---
 
-## Arquitectura del Sistema
+## System Architecture
 
-El sistema implementa una arquitectura por capas desacoplada basada en el **Patrón Repository**:
+The system implements a decoupled layered architecture based on the **Repository Pattern**:
 
 ```mermaid
 flowchart TD
-    subgraph ClientLayer ["Cliente Web (Angular 19)"]
-        UI["Componentes UI: Dashboard, Tabla, Filtros, Modales"]
-        Signals["Angular Signals State & Reactividad"]
+    subgraph ClientLayer ["Web Client (Angular 19)"]
+        UI["UI Components: Dashboard, Table, Filters, Modals"]
+        Signals["Angular Signals State & Reactivity"]
         i18n["TranslationService (ES / EN)"]
         HttpServices["DepositService & DashboardService"]
     end
 
     subgraph ApiLayer ["Backend API (.NET 8)"]
         Controllers["Controllers: Deposits, Dashboard, Health"]
-        ServiceLayer["IDepositService / DepositService (Reglas de Negocio)"]
+        ServiceLayer["IDepositService / DepositService (Business Rules)"]
         RepoLayer["IDepositRepository / DepositRepository"]
         DbContext["EF Core DbContext (CashReconciliationDbContext)"]
     end
 
-    subgraph DatabaseLayer ["Persistencia"]
+    subgraph DatabaseLayer ["Persistence"]
         SqlServer[("SQL Server: CashReconciliation DB")]
     end
 
@@ -86,45 +98,45 @@ flowchart TD
 
 ---
 
-## Reglas de Negocio
+## Business Rules
 
-### 1. Cálculo de la Varianza (Diferencia de Efectivo)
-$$\text{Varianza} = \text{Monto Real Contado} - \text{Monto Esperado}$$
+### 1. Variance Calculation (Cash Discrepancy)
+$$\text{Variance} = \text{Actual Amount Counted} - \text{Expected Amount}$$
 
-### 2. Clasificación Automática de Estados
-* $\text{Varianza} = 0 \longrightarrow$ **Conciliado (`Reconciled`)**: El efectivo contado coincide con el monto esperado.
-* $\text{Varianza} > 0 \longrightarrow$ **Sobrante (`Over`)**: Hay más dinero en la bolsa del que reportó la tienda.
-* $\text{Varianza} < 0 \longrightarrow$ **Faltante (`Short`)**: Falta dinero en la bolsa respecto a lo reportado.
+### 2. Automatic Status Classification
+* $\text{Variance} = 0 \longrightarrow$ **Reconciled (`Reconciled`)**: Counted cash matches the expected amount exactly.
+* $\text{Variance} > 0 \longrightarrow$ **Over (`Over`)**: More cash was found in the bag than reported by the store.
+* $\text{Variance} < 0 \longrightarrow$ **Short (`Short`)**: Less cash was found in the bag than reported by the store.
 
-### 3. Validaciones de Integridad
-* `DepositNumber`: Obligatorio, único en el sistema (índice único en base de datos).
-* `StoreNumber`: Obligatorio (no nulo, longitud máxima 50 caracteres).
-* `ExpectedAmount`: Mayor estrictamente a 0 (`> 0.00`).
-* `ActualAmount`: Mayor o igual a 0 (`>= 0.00`) al momento de conciliar.
-* `DepositDate`: Fecha válida del depósito.
-* `ReconciledAt`: Fecha y hora UTC automática registrada al conciliar.
+### 3. Integrity Validations
+* `DepositNumber`: Mandatory, unique in the system (unique database index).
+* `StoreNumber`: Mandatory (non-null, maximum length 50 characters).
+* `ExpectedAmount`: Strictly greater than 0 (`> 0.00`).
+* `ActualAmount`: Greater than or equal to 0 (`>= 0.00`) when reconciling.
+* `DepositDate`: Valid deposit date.
+* `ReconciledAt`: Automatic UTC timestamp recorded upon reconciliation.
 
 ---
 
-## Requisitos Previos
+## Prerequisites
 
-Antes de ejecutar la aplicación, asegúrese de tener instalado:
-* [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (versión 8.0.x o superior).
-* [Node.js](https://nodejs.org/) (versión 18.x o 20.x LTS) y `npm`.
+Before running the application, ensure you have the following installed:
+* [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (version 8.0.x or higher).
+* [Node.js](https://nodejs.org/) (version 18.x or 20.x LTS) and `npm`.
 * [Angular CLI](https://angular.dev/) (`npm install -g @angular/cli@19`).
-* [Microsoft SQL Server](https://www.microsoft.com/sql-server/) (SQL Server Express, Developer o LocalDB).
-* Herramientas globales de EF Core (opcional, para migraciones manuales):
+* [Microsoft SQL Server](https://www.microsoft.com/sql-server/) (SQL Server Express, Developer, or LocalDB).
+* Global EF Core CLI tools (optional, for manual migrations):
   ```bash
   dotnet tool install --global dotnet-ef
   ```
 
 ---
 
-## Instalación y Configuración
+## Installation & Setup
 
-### 1. Configuración de la Base de Datos
+### 1. Database Configuration
 
-1. Abra el archivo [BackEnd/appsettings.json](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/BackEnd/appsettings.json) y verifique la cadena de conexión:
+1. Open [BackEnd/appsettings.json](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/BackEnd/appsettings.json) and verify the connection string:
    ```json
    {
      "ConnectionStrings": {
@@ -132,16 +144,16 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
      }
    }
    ```
-   *(Ajuste la instancia del servidor `Server=...` si su instalación de SQL Server difiere de `localhost\SQLEXPRESS`).*
+   *(Adjust the server instance `Server=...` if your SQL Server instance differs from `localhost\SQLEXPRESS`).*
 
-2. Aplique las migraciones de Entity Framework Core para crear la base de datos, las tablas y sembrar los datos iniciales (*seed data*):
+2. Apply Entity Framework Core migrations to create the database, tables, and seed initial records (*seed data*):
    ```powershell
    cd BackEnd
    dotnet ef database update
    ```
 
-   **Datos iniciales sembrados automáticamente:**
-   | Número Depósito | Tienda | Monto Esperado | Estado Inicial |
+   **Automatically Seeded Initial Records:**
+   | Deposit Number | Store | Expected Amount | Initial Status |
    | :--- | :--- | :--- | :--- |
    | `DEP1001` | `ST001` | $5,000.00 | Pending |
    | `DEP1002` | `ST002` | $4,250.00 | Pending |
@@ -151,59 +163,59 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
 
 ---
 
-### 2. Ejecución del Backend (.NET 8 API)
+### 2. Running the Backend (.NET 8 API)
 
-1. En una terminal, navegue a la carpeta `BackEnd`:
+1. In a terminal, navigate to the `BackEnd` directory:
    ```powershell
    cd BackEnd
    dotnet run --launch-profile http
    ```
-2. La API estará disponible en:
-   * **URL Base**: `http://localhost:5017`
-   * **Swagger UI (Documentación interactiva)**: `http://localhost:5017/swagger`
+2. The API will be available at:
+   * **Base URL**: `http://localhost:5017`
+   * **Swagger UI (Interactive Docs)**: `http://localhost:5017/swagger`
    * **Health Check**: `http://localhost:5017/api/health`
 
 ---
 
-### 3. Ejecución del Frontend (Angular 19)
+### 3. Running the Frontend (Angular 19)
 
-1. En una segunda terminal, navegue a la carpeta `FrontEnd`:
+1. In a second terminal, navigate to the `FrontEnd` directory:
    ```powershell
    cd FrontEnd
    npm install
    npm start
    ```
-2. Abra su navegador web en:
-   * **URL Portal**: `http://localhost:4200`
+2. Open your web browser at:
+   * **Portal URL**: `http://localhost:4200`
 
 ---
 
-## Documentación de la API REST
+## REST API Documentation
 
-### Endpoints Disponibles
+### Available Endpoints
 
-| Método | Endpoint | Descripción | Códigos de Respuesta |
+| Method | Endpoint | Description | Response Codes |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/health` | Verificación de disponibilidad del servicio | `200 OK` |
-| `GET` | `/api/deposits` | Listado paginado/filtrado de depósitos | `200 OK` |
-| `GET` | `/api/deposits/{id}` | Obtener detalle de un depósito por su ID | `200 OK`, `404 Not Found` |
-| `GET` | `/api/deposits/{id}/audit-logs` | Historial cronológico de auditoría (*Audit Trail*) | `200 OK`, `404 Not Found` |
-| `GET` | `/api/deposits/export` | Exportar resultados de búsqueda a archivo CSV (UTF-8 BOM) | `200 OK` |
-| `POST` | `/api/deposits` | Registrar un nuevo depósito en bóveda | `201 Created`, `400 Bad Request` |
-| `PUT` | `/api/deposits/{id}/reconcile` | Conciliar depósito ingresando monto real | `200 OK`, `400 Bad Request`, `404 Not Found` |
-| `GET` | `/api/dashboard` | Métricas consolidadas del dashboard (soporta filtros de búsqueda) | `200 OK` |
+| `GET` | `/api/health` | Service health status check | `200 OK` |
+| `GET` | `/api/deposits` | Paginated & filtered list of deposits | `200 OK` |
+| `GET` | `/api/deposits/{id}` | Get deposit details by ID | `200 OK`, `404 Not Found` |
+| `GET` | `/api/deposits/{id}/audit-logs` | Chronological audit trail history | `200 OK`, `404 Not Found` |
+| `GET` | `/api/deposits/export` | Export filtered search results to CSV (UTF-8 BOM) | `200 OK` |
+| `POST` | `/api/deposits` | Register a new deposit into the vault | `201 Created`, `400 Bad Request` |
+| `PUT` | `/api/deposits/{id}/reconcile` | Reconcile a deposit with counted actual amount | `200 OK`, `400 Bad Request`, `404 Not Found` |
+| `GET` | `/api/dashboard` | Consolidated dashboard metrics (supports search filters) | `200 OK` |
 
-### Parámetros de Consulta y Filtro en `GET /api/deposits`
+### Query & Filter Parameters for `GET /api/deposits`
 
-* `depositNumber` (string): Búsqueda parcial por número de depósito.
-* `storeNumber` (string): Búsqueda parcial por tienda.
-* `status` (string): Filtrar por estado (`Pending`, `Reconciled`, `Over`, `Short`).
-* `startDate` (DateTime): Fecha mínima de depósito.
-* `endDate` (DateTime): Fecha máxima de depósito.
-* `pageNumber` (int, por defecto `1`, mín `1`): Número de página solicitada para paginación en servidor.
-* `pageSize` (int, por defecto `10`, mín `1`, máx `100`): Cantidad de registros por página.
+* `depositNumber` (string): Partial search by deposit number.
+* `storeNumber` (string): Partial search by store number.
+* `status` (string): Filter by status (`Pending`, `Reconciled`, `Over`, `Short`).
+* `startDate` (DateTime): Minimum deposit date.
+* `endDate` (DateTime): Maximum deposit date.
+* `pageNumber` (int, default `1`, min `1`): Requested page number for server-side pagination.
+* `pageSize` (int, default `10`, min `1`, max `100`): Number of records per page.
 
-#### Estructura de Respuesta Paginada (`PagedResult<DepositDto>`)
+#### Paginated Response Structure (`PagedResult<DepositDto>`)
 ```json
 {
   "items": [
@@ -229,9 +241,9 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
 }
 ```
 
-### Ejemplos de Peticiones y Respuestas
+### Request & Response Examples
 
-#### 1. Registrar Depósito (`POST /api/deposits`)
+#### 1. Register Deposit (`POST /api/deposits`)
 **Request Body:**
 ```json
 {
@@ -257,7 +269,7 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
 }
 ```
 
-#### 2. Conciliar Depósito (`PUT /api/deposits/{id}/reconcile`)
+#### 2. Reconcile Deposit (`PUT /api/deposits/{id}/reconcile`)
 **Request Body:**
 ```json
 {
@@ -280,7 +292,7 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
 }
 ```
 
-#### 3. Consultar Registro de Auditoría (`GET /api/deposits/{id}/audit-logs`)
+#### 3. Retrieve Audit Trail (`GET /api/deposits/{id}/audit-logs`)
 **Response (`200 OK`):**
 ```json
 [
@@ -294,8 +306,8 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
     "newVariance": -50.00,
     "previousStatus": "Pending",
     "newStatus": "Short",
-    "performedBy": "Operador de Bóveda",
-    "notes": "Conciliación inicial de depósito",
+    "performedBy": "Vault Operator",
+    "notes": "Initial deposit reconciliation",
     "timestamp": "2026-10-23T16:30:00.000Z"
   },
   {
@@ -308,27 +320,27 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
     "newVariance": null,
     "previousStatus": null,
     "newStatus": "Pending",
-    "performedBy": "Operador de Bóveda",
-    "notes": "Depósito registrado con monto esperado de $2,500.00",
+    "performedBy": "Vault Operator",
+    "notes": "Deposit registered with expected amount of $2,500.00",
     "timestamp": "2026-10-23T16:25:00.000Z"
   }
 ]
 ```
 
-#### 4. Exportar a CSV (`GET /api/deposits/export`)
+#### 4. Export to CSV (`GET /api/deposits/export`)
 **Headers:**
 ```http
 Content-Type: text/csv; charset=utf-8
 Content-Disposition: attachment; filename="deposits_export_20261023_170000.csv"
 ```
-**Response Body (UTF-8 BOM con cabeceras y registros filtrados):**
+**Response Body (UTF-8 BOM with headers and filtered records):**
 ```csv
 Deposit Number,Store Number,Deposit Date,Expected Amount,Actual Amount,Variance,Status,Reconciled At,Created At
 DEP1001,ST001,2026-10-23 04:00:00,5000.00,5000.00,0.00,Reconciled,2026-10-23 04:30:00,2026-10-23 04:00:00
 DEP1002,ST002,2026-10-23 04:00:00,4250.00,,,Pending,,2026-10-23 04:00:00
 ```
 
-#### 5. Resumen de Dashboard (`GET /api/dashboard`)
+#### 5. Dashboard Summary (`GET /api/dashboard`)
 **Response (`200 OK`):**
 ```json
 {
@@ -345,35 +357,35 @@ DEP1002,ST002,2026-10-23 04:00:00,4250.00,,,Pending,,2026-10-23 04:00:00
 
 ---
 
-## Ejecución de Pruebas Automatizadas
+## Automated Testing
 
-### Pruebas Unitarias del Backend (xUnit + Moq)
-El proyecto [BackEnd.Tests](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/BackEnd.Tests) contiene 14 pruebas unitarias exhaustivas para la capa de servicios, reglas de conciliación, auditoría, exportación y paginación:
+### Backend Unit Tests (xUnit + Moq)
+The [BackEnd.Tests](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/BackEnd.Tests) project contains 14 comprehensive unit tests covering the service layer, reconciliation rules, audit logging, export, and pagination:
 ```powershell
 dotnet test BackEnd.Tests/BackEnd.Tests.csproj
 ```
-**Casos de prueba cubiertos:**
-* Conciliación con varianza cero $\rightarrow$ Estado `Reconciled`.
-* Conciliación con sobrante $\rightarrow$ Estado `Over`.
-* Conciliación con faltante $\rightarrow$ Estado `Short`.
-* Intento de conciliación de depósito inexistente $\rightarrow$ Retorna `null`.
-* Registro con número de depósito duplicado $\rightarrow$ Lanza `InvalidOperationException`.
-* Registro válido $\rightarrow$ Guarda con estado `Pending` y campos auditados.
-* Métricas de dashboard consolidadas (global y con filtros).
-* Creación de depósito registra evento de auditoría inicial (`Action = "Created"`).
-* Conciliación inicial registra evento de auditoría (`Action = "Reconciled"`).
-* Re-conciliación subsecuente registra evento de auditoría (`Action = "Re-Reconciled"`) capturando valores previos.
-* Obtención de registros de auditoría por depósito mapeados a DTOs.
-* Exportación a CSV con codificación UTF-8 BOM, cabeceras normalizadas y escapado de caracteres especiales.
-* Paginación en servidor con cálculo de `TotalCount`, `TotalPages`, navegación anterior/siguiente y rebanado `Skip/Take`.
+**Test Cases Covered:**
+* Zero variance reconciliation $\rightarrow$ Status `Reconciled`.
+* Overage reconciliation $\rightarrow$ Status `Over`.
+* Shortage reconciliation $\rightarrow$ Status `Short`.
+* Attempt to reconcile non-existent deposit $\rightarrow$ Returns `null`.
+* Registration with duplicate deposit number $\rightarrow$ Throws `InvalidOperationException`.
+* Valid registration $\rightarrow$ Persists with `Pending` status and audit fields.
+* Consolidated dashboard metrics (global and with active filters).
+* Deposit creation logs initial audit event (`Action = "Created"`).
+* Initial reconciliation logs audit event (`Action = "Reconciled"`).
+* Subsequent re-reconciliation logs audit event (`Action = "Re-Reconciled"`) capturing previous values.
+* Retrieval of audit logs by deposit mapped to DTOs.
+* CSV export with UTF-8 BOM encoding, standardized headers, and escaped special characters.
+* Server-side pagination calculating `TotalCount`, `TotalPages`, next/prev flags, and `Skip/Take` slicing.
 
-### Pruebas Unitarias del Frontend (Angular + Jasmine)
-El proyecto [FrontEnd](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/FrontEnd) incluye 23 pruebas unitarias exhaustivas:
+### Frontend Unit Tests (Angular + Jasmine)
+The [FrontEnd](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/FrontEnd) project includes 23 unit tests executed with Karma and Headless Chrome:
 ```powershell
 cd FrontEnd
 npm test -- --watch=false --browsers=ChromeHeadless
 ```
-O validación del compilador TypeScript y empaquetado de producción:
+Or validate TypeScript compilation and production packaging:
 ```powershell
 cd FrontEnd
 npm run build
@@ -381,72 +393,73 @@ npm run build
 
 ---
 
-## Internacionalización y Soporte Multilingüe (i18n)
+## Internationalization & Multilingual Support (i18n)
 
-La aplicación soporta **Español** (idioma predeterminado) e **Inglés**:
-* **Arquitectura Reactiva**: Basada en Angular Signals (`currentLang = signal<SupportedLang>('es')`).
-* **Traducción en Plantillas**: Mediante el pipe `TranslatePipe` (`{{ 'DEPOSIT_NUMBER' | translate }}`).
-* **Persistencia**: La preferencia del usuario se almacena en el `localStorage` del navegador.
-* **Cobertura Total**: Textos de cabecera, tarjetas de KPI, filtros, columnas de tabla, botones de acción, estados (`Pendiente / Pending`, `Conciliado / Reconciled`, etc.), controles de paginación y mensajes de validación reactiva.
+The application supports **English** and **Spanish** (with Spanish as the initial default):
+* **Reactive Architecture**: Built on Angular Signals (`currentLang = signal<SupportedLang>('es')`).
+* **Template Translation**: Via `TranslatePipe` (`{{ 'DEPOSIT_NUMBER' | translate }}`).
+* **Persistence**: User preference is stored in browser `localStorage`.
+* **Complete Coverage**: Header text, KPI cards, filters, table columns, action buttons, statuses (`Pending / Pendiente`, `Reconciled / Conciliado`, etc.), pagination controls, and reactive validation messages.
 
 ---
 
-## Estructura del Proyecto
+## Project Structure
 
 ```text
 Cash Reconciliation Portal/
 ├── .gitignore
-├── README.md                                 # Documentación principal del sistema
-├── BackEnd/                                  # Proyecto ASP.NET Core Web API (.NET 8)
+├── README.md                                 # English documentation
+├── README.es.md                              # Spanish documentation
+├── BackEnd/                                  # ASP.NET Core Web API Project (.NET 8)
 │   ├── CashReconciliation.Api.csproj
-│   ├── Program.cs                            # Configuración de servicios, CORS, Swagger y DI
-│   ├── appsettings.json                      # Cadenas de conexión y configuración
+│   ├── Program.cs                            # Service configuration, CORS, Swagger, DI
+│   ├── appsettings.json                      # Connection strings and configuration
 │   ├── Controllers/
-│   │   ├── DashboardController.cs            # Métricas agregadas
-│   │   ├── DepositsController.cs             # CRUD y conciliación de depósitos
-│   │   └── HealthController.cs               # Health check del sistema
+│   │   ├── DashboardController.cs            # Aggregate KPI metrics
+│   │   ├── DepositsController.cs             # Deposit CRUD, reconciliation, export & audit
+│   │   └── HealthController.cs               # System health check
 │   ├── Data/
-│   │   └── CashReconciliationDbContext.cs    # EF Core DbContext, Fluent API y Seed Data
-│   ├── DTOs/                                 # Contratos de petición y respuesta (PagedResult, etc.)
-│   ├── Migrations/                           # Migraciones de EF Core
-│   ├── Models/                               # Entidades de dominio (Deposit, DepositAuditLog)
-│   ├── Repositories/                         # Abstracción y acceso a datos
+│   │   └── CashReconciliationDbContext.cs    # EF Core DbContext, Fluent API & Seed Data
+│   ├── DTOs/                                 # Request and response contracts (PagedResult, etc.)
+│   ├── Migrations/                           # EF Core migrations
+│   ├── Models/                               # Domain entities (Deposit, DepositAuditLog)
+│   ├── Repositories/                         # Data access layer
 │   │   ├── IDepositRepository.cs
 │   │   └── DepositRepository.cs
-│   └── Services/                             # Lógica de negocio y reglas de conciliación
+│   └── Services/                             # Business logic and reconciliation rules
 │       ├── IDepositService.cs
 │       └── DepositService.cs
-├── BackEnd.Tests/                            # Suite de pruebas unitarias xUnit (.NET 8)
+├── BackEnd.Tests/                            # xUnit Unit Testing Suite (.NET 8)
 │   ├── BackEnd.Tests.csproj
-│   └── DepositServiceTests.cs                # Tests unitarios con Moq
-└── FrontEnd/                                 # Aplicación SPA Angular 19
+│   └── DepositServiceTests.cs                # Moq unit tests
+└── FrontEnd/                                 # Angular 19 SPA Application
     ├── angular.json
     ├── package.json
     ├── src/
-    │   ├── index.html                        # Carga de tipografías Outfit y Plus Jakarta Sans
-    │   ├── styles.css                        # Tokens globales, glassmorphism y diseño moderno
+    │   ├── index.html                        # Outfit & Plus Jakarta Sans typography
+    │   ├── styles.css                        # Global tokens, glassmorphism, modern light design
     │   └── app/
-    │       ├── app.component.ts              # Lógica principal, Signals, paginación y modales
-    │       ├── app.component.html            # Plantilla con diseño semántico y responsive
-    │       ├── app.component.css             # Estilos de componentes y micro-animaciones
-    │       ├── app.component.spec.ts         # Pruebas unitarias de componentes (23 tests)
+    │       ├── app.component.ts              # Main logic, Signals, pagination & modals
+    │       ├── app.component.html            # Semantic and responsive layout template
+    │       ├── app.component.css             # Component styles and micro-animations
+    │       ├── app.component.spec.ts         # Component unit tests (23 tests)
     │       ├── i18n/
-    │       │   └── translations.ts           # Diccionarios bilingües completos (ES / EN)
+    │       │   └── translations.ts           # Bilingual dictionaries (EN / ES)
     │       ├── models/
-    │       │   └── deposit.model.ts          # Tipado e interfaces TypeScript
+    │       │   └── deposit.model.ts          # TypeScript strict typing & interfaces
     │       ├── pipes/
-    │       │   └── translate.pipe.ts         # Pipe reactivo de internacionalización
+    │       │   └── translate.pipe.ts         # Reactive i18n pipe
     │       └── services/
-    │           ├── dashboard.service.ts      # Cliente HTTP para métricas
-    │           ├── deposit.service.ts        # Cliente HTTP para depósitos
-    │           └── translation.service.ts    # Servicio reactivo de i18n
+    │           ├── dashboard.service.ts      # HTTP client for dashboard metrics
+    │           ├── deposit.service.ts        # HTTP client for deposits
+    │           └── translation.service.ts    # Reactive i18n service
 ```
 
 ---
 
-## Historial de Commits en Git
+## Git Commit History
 
-Para garantizar la máxima calidad y trazabilidad conforme a la especificación *Conventional Commits*:
+Maintained according to the *Conventional Commits* specification:
 
 1. `feat(backend): initialize .NET 8 Web API project and implement health check endpoint`
 2. `feat(backend): configure ef core, sql server context, migrations and seed data`
@@ -457,4 +470,3 @@ Para garantizar la máxima calidad y trazabilidad conforme a la especificación 
 7. `feat(audit): implement deposit audit trail logging, rest endpoint and ui timeline`
 8. `feat(export): implement server-side csv export with active filters and frontend download`
 9. `feat(pagination): implement server-side pagination with controls and paged results`
-
