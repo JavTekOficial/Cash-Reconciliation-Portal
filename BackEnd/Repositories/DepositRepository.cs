@@ -17,6 +17,17 @@ public class DepositRepository : IDepositRepository
     public async Task<IEnumerable<Deposit>> GetAllAsync(DepositFilterParams filters, CancellationToken cancellationToken = default)
     {
         var query = _context.Deposits.AsNoTracking().AsQueryable();
+        query = ApplyFilters(query, filters);
+
+        return await query
+            .OrderByDescending(d => d.DepositDate)
+            .ThenByDescending(d => d.DepositId)
+            .ToListAsync(cancellationToken);
+    }
+
+    private static IQueryable<Deposit> ApplyFilters(IQueryable<Deposit> query, DepositFilterParams? filters)
+    {
+        if (filters is null) return query;
 
         if (!string.IsNullOrWhiteSpace(filters.DepositNumber))
         {
@@ -48,10 +59,7 @@ public class DepositRepository : IDepositRepository
             query = query.Where(d => d.DepositDate <= end);
         }
 
-        return await query
-            .OrderByDescending(d => d.DepositDate)
-            .ThenByDescending(d => d.DepositId)
-            .ToListAsync(cancellationToken);
+        return query;
     }
 
     public async Task<Deposit?> GetByIdAsync(int depositId, CancellationToken cancellationToken = default)
@@ -85,9 +93,12 @@ public class DepositRepository : IDepositRepository
         await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<DashboardSummaryDto> GetDashboardMetricsAsync(CancellationToken cancellationToken = default)
+    public async Task<DashboardSummaryDto> GetDashboardMetricsAsync(DepositFilterParams? filters = null, CancellationToken cancellationToken = default)
     {
-        var deposits = await _context.Deposits.AsNoTracking().ToListAsync(cancellationToken);
+        var query = _context.Deposits.AsNoTracking().AsQueryable();
+        query = ApplyFilters(query, filters);
+
+        var deposits = await query.ToListAsync(cancellationToken);
 
         return new DashboardSummaryDto
         {

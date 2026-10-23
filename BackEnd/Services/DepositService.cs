@@ -90,9 +90,9 @@ public class DepositService : IDepositService
         return MapToDto(deposit);
     }
 
-    public async Task<DashboardSummaryDto> GetDashboardSummaryAsync(CancellationToken cancellationToken = default)
+    public async Task<DashboardSummaryDto> GetDashboardSummaryAsync(DepositFilterParams? filters = null, CancellationToken cancellationToken = default)
     {
-        return await _repository.GetDashboardMetricsAsync(cancellationToken);
+        return await _repository.GetDashboardMetricsAsync(filters, cancellationToken);
     }
 
     private static DepositDto MapToDto(Deposit entity) => new()

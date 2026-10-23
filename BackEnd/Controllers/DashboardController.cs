@@ -17,13 +17,13 @@ public class DashboardController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves dashboard summary metrics for cash reconciliation.
+    /// Retrieves dashboard summary metrics for cash reconciliation, optionally filtered.
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(DashboardSummaryDto), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Get(CancellationToken cancellationToken)
+    public async Task<IActionResult> Get([FromQuery] DepositFilterParams? filters, CancellationToken cancellationToken)
     {
-        var metrics = await _depositService.GetDashboardSummaryAsync(cancellationToken);
+        var metrics = await _depositService.GetDashboardSummaryAsync(filters, cancellationToken);
         return Ok(metrics);
     }
 }

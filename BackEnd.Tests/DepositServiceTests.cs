@@ -223,7 +223,7 @@ public class DepositServiceTests
         };
 
         _repositoryMock
-            .Setup(r => r.GetDashboardMetricsAsync(It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetDashboardMetricsAsync(null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedSummary);
 
         // Act
@@ -235,5 +235,42 @@ public class DepositServiceTests
         Assert.Equal(3, result.PendingCount);
         Assert.Equal(5, result.ReconciledCount);
         Assert.Equal(-50.00m, result.TotalVariance);
+    }
+
+    [Fact]
+    public async Task GetDashboardSummaryAsync_WithFilters_PassesFiltersToRepository()
+    {
+        // Arrange
+        var filters = new DepositFilterParams
+        {
+            StoreNumber = "ST001",
+            Status = "Short"
+        };
+
+        var expectedSummary = new DashboardSummaryDto
+        {
+            TotalDeposits = 2,
+            PendingCount = 0,
+            ReconciledCount = 0,
+            ShortCount = 2,
+            OverCount = 0,
+            TotalVariance = -150.00m,
+            TotalExpectedAmount = 8000.00m,
+            TotalActualAmount = 7850.00m
+        };
+
+        _repositoryMock
+            .Setup(r => r.GetDashboardMetricsAsync(filters, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expectedSummary);
+
+        // Act
+        var result = await _service.GetDashboardSummaryAsync(filters);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(2, result.TotalDeposits);
+        Assert.Equal(2, result.ShortCount);
+        Assert.Equal(-150.00m, result.TotalVariance);
+        _repositoryMock.Verify(r => r.GetDashboardMetricsAsync(filters, It.IsAny<CancellationToken>()), Times.Once);
     }
 }

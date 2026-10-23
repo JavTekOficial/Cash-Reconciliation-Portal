@@ -11,5 +11,5 @@ public interface IDepositRepository
     Task<bool> ExistsAsync(string depositNumber, CancellationToken cancellationToken = default);
     Task<Deposit> AddAsync(Deposit deposit, CancellationToken cancellationToken = default);
     Task UpdateAsync(Deposit deposit, CancellationToken cancellationToken = default);
-    Task<DashboardSummaryDto> GetDashboardMetricsAsync(CancellationToken cancellationToken = default);
+    Task<DashboardSummaryDto> GetDashboardMetricsAsync(DepositFilterParams? filters = null, CancellationToken cancellationToken = default);
 }
