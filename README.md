@@ -17,7 +17,7 @@ Sistema integral de nivel empresarial para la gestión, recepción y conciliaci�
    - [Ejecución del Frontend (Angular 19)](#3-ejecución-del-frontend-angular-19)
 7. [Documentación de la API REST](#documentación-de-la-api-rest)
 8. [Ejecución de Pruebas Automatizadas](#ejecución-de-pruebas-automatizadas)
-9. [Internacionalización y Soporte Multilingüe (i18n)](#internacionalización-y-soporte-multilingüe-i18n)
+9. [Internacionalización y Soporte Multilingüe](#internacionalización-y-soporte-multilingüe-i18n)
 10. [Estructura del Proyecto](#estructura-del-proyecto)
 11. [Historial de Commits en Git](#historial-de-commits-en-git)
 
@@ -77,7 +77,7 @@ flowchart TD
     UI --> Signals
     Signals --> HttpServices
     i18n -.-> UI
-    HttpServices -->|HTTP / JSON (CORS)| Controllers
+    HttpServices -->|HTTP / JSON| Controllers
     Controllers --> ServiceLayer
     ServiceLayer --> RepoLayer
     RepoLayer --> DbContext
