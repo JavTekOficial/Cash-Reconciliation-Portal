@@ -62,6 +62,37 @@ export class AppComponent implements OnInit {
   // CSV export state
   readonly isExporting = signal<boolean>(false);
 
+  // Server-side Pagination state
+  readonly currentPage = signal<number>(1);
+  readonly pageSize = signal<number>(10);
+  readonly totalCount = signal<number>(0);
+  readonly totalPages = signal<number>(1);
+  readonly hasPreviousPage = signal<boolean>(false);
+  readonly hasNextPage = signal<boolean>(false);
+
+  readonly pageRangeStart = computed(() => {
+    return this.totalCount() === 0 ? 0 : (this.currentPage() - 1) * this.pageSize() + 1;
+  });
+
+  readonly pageRangeEnd = computed(() => {
+    return Math.min(this.currentPage() * this.pageSize(), this.totalCount());
+  });
+
+  readonly visiblePages = computed(() => {
+    const current = this.currentPage();
+    const total = this.totalPages();
+    const pages: number[] = [];
+    const delta = 2;
+
+    const start = Math.max(1, current - delta);
+    const end = Math.min(total, current + delta);
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  });
+
   // Filter Form
   filterDepositNumber = '';
   filterStoreNumber = '';
@@ -125,22 +156,33 @@ export class AppComponent implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    const filters: DepositFilter = {};
-    if (this.filterDepositNumber.trim()) filters.depositNumber = this.filterDepositNumber.trim();
-    if (this.filterStoreNumber.trim()) filters.storeNumber = this.filterStoreNumber.trim();
-    if (this.filterStatus.trim()) filters.status = this.filterStatus.trim();
-    if (this.filterStartDate) filters.startDate = this.filterStartDate;
-    if (this.filterEndDate) filters.endDate = this.filterEndDate;
+    const searchFilters: DepositFilter = {};
+    if (this.filterDepositNumber.trim()) searchFilters.depositNumber = this.filterDepositNumber.trim();
+    if (this.filterStoreNumber.trim()) searchFilters.storeNumber = this.filterStoreNumber.trim();
+    if (this.filterStatus.trim()) searchFilters.status = this.filterStatus.trim();
+    if (this.filterStartDate) searchFilters.startDate = this.filterStartDate;
+    if (this.filterEndDate) searchFilters.endDate = this.filterEndDate;
 
     const hasFilters = Boolean(
-      filters.depositNumber || filters.storeNumber || filters.status || filters.startDate || filters.endDate
+      searchFilters.depositNumber || searchFilters.storeNumber || searchFilters.status || searchFilters.startDate || searchFilters.endDate
     );
     this.hasActiveFilters.set(hasFilters);
 
-    // Load deposits
-    this.depositService.getDeposits(filters).subscribe({
+    // Filters for paged deposits query
+    const pagedFilters: DepositFilter = {
+      ...searchFilters,
+      pageNumber: this.currentPage(),
+      pageSize: this.pageSize()
+    };
+
+    // Load deposits (paged)
+    this.depositService.getDeposits(pagedFilters).subscribe({
       next: (data) => {
-        this.deposits.set(data);
+        this.deposits.set(data.items);
+        this.totalCount.set(data.totalCount);
+        this.totalPages.set(data.totalPages);
+        this.hasPreviousPage.set(data.hasPreviousPage);
+        this.hasNextPage.set(data.hasNextPage);
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -160,8 +202,8 @@ export class AppComponent implements OnInit {
       }
     });
 
-    // Load filtered summary metrics (dynamic totals for bottom cards based on filters)
-    this.dashboardService.getSummary(filters).subscribe({
+    // Load filtered summary metrics (dynamic totals for bottom cards based on search filters across all pages)
+    this.dashboardService.getSummary(searchFilters).subscribe({
       next: (summary) => {
         this.filteredSummary.set(summary);
       },
@@ -172,6 +214,7 @@ export class AppComponent implements OnInit {
   }
 
   applyFilters(): void {
+    this.currentPage.set(1);
     this.loadData();
   }
 
@@ -181,7 +224,37 @@ export class AppComponent implements OnInit {
     this.filterStatus = '';
     this.filterStartDate = '';
     this.filterEndDate = '';
+    this.currentPage.set(1);
     this.loadData();
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages() && page !== this.currentPage()) {
+      this.currentPage.set(page);
+      this.loadData();
+    }
+  }
+
+  previousPage(): void {
+    if (this.hasPreviousPage()) {
+      this.goToPage(this.currentPage() - 1);
+    }
+  }
+
+  nextPage(): void {
+    if (this.hasNextPage()) {
+      this.goToPage(this.currentPage() + 1);
+    }
+  }
+
+  onPageSizeChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const newSize = Number(select.value);
+    if (newSize > 0 && newSize !== this.pageSize()) {
+      this.pageSize.set(newSize);
+      this.currentPage.set(1);
+      this.loadData();
+    }
   }
 
   exportToCsv(): void {

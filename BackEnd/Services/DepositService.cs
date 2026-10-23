@@ -23,6 +23,18 @@ public class DepositService : IDepositService
         return deposits.Select(MapToDto);
     }
 
+    public async Task<PagedResult<DepositDto>> GetPagedDepositsAsync(DepositFilterParams filters, CancellationToken cancellationToken = default)
+    {
+        var paged = await _repository.GetPagedAsync(filters, cancellationToken);
+        return new PagedResult<DepositDto>
+        {
+            Items = paged.Items.Select(MapToDto),
+            TotalCount = paged.TotalCount,
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize
+        };
+    }
+
     public async Task<DepositDto?> GetDepositByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         var deposit = await _repository.GetByIdAsync(id, cancellationToken);

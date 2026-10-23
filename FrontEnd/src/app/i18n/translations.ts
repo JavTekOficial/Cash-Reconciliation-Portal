@@ -114,7 +114,19 @@ export const TRANSLATIONS: Record<SupportedLang, Record<string, string>> = {
     // CSV Export
     'EXPORT_CSV_BTN': 'Exportar CSV',
     'EXPORTING': 'Generando CSV...',
-    'SUCCESS_EXPORT': 'Archivo CSV generado y descargado exitosamente.'
+    'SUCCESS_EXPORT': 'Archivo CSV generado y descargado exitosamente.',
+
+    // Pagination
+    'PAGINATION_PAGE': 'Página',
+    'PAGINATION_OF': 'de',
+    'PAGINATION_ITEMS_PER_PAGE': 'Por página',
+    'PAGINATION_PREV': 'Anterior',
+    'PAGINATION_NEXT': 'Siguiente',
+    'PAGINATION_FIRST': 'Primera',
+    'PAGINATION_LAST': 'Última',
+    'PAGINATION_SHOWING': 'Mostrando',
+    'PAGINATION_TO': 'a',
+    'PAGINATION_TOTAL_RECORDS': 'registros en total'
   },
   en: {
     // Header & Brand
@@ -229,6 +241,18 @@ export const TRANSLATIONS: Record<SupportedLang, Record<string, string>> = {
     // CSV Export
     'EXPORT_CSV_BTN': 'Export CSV',
     'EXPORTING': 'Generating CSV...',
-    'SUCCESS_EXPORT': 'CSV file generated and downloaded successfully.'
+    'SUCCESS_EXPORT': 'CSV file generated and downloaded successfully.',
+
+    // Pagination
+    'PAGINATION_PAGE': 'Page',
+    'PAGINATION_OF': 'of',
+    'PAGINATION_ITEMS_PER_PAGE': 'Per page',
+    'PAGINATION_PREV': 'Previous',
+    'PAGINATION_NEXT': 'Next',
+    'PAGINATION_FIRST': 'First',
+    'PAGINATION_LAST': 'Last',
+    'PAGINATION_SHOWING': 'Showing',
+    'PAGINATION_TO': 'to',
+    'PAGINATION_TOTAL_RECORDS': 'total records'
   }
 };

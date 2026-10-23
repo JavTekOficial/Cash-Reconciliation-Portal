@@ -5,7 +5,7 @@ import { of, throwError } from 'rxjs';
 import { AppComponent } from './app.component';
 import { DepositService } from './services/deposit.service';
 import { DashboardService } from './services/dashboard.service';
-import { Deposit, DashboardSummary } from './models/deposit.model';
+import { Deposit, DashboardSummary, PagedResult } from './models/deposit.model';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -40,6 +40,16 @@ describe('AppComponent', () => {
     }
   ];
 
+  const mockPagedDeposits: PagedResult<Deposit> = {
+    items: mockDeposits,
+    pageNumber: 1,
+    pageSize: 10,
+    totalCount: 2,
+    totalPages: 1,
+    hasPreviousPage: false,
+    hasNextPage: false
+  };
+
   const mockDashboard: DashboardSummary = {
     totalDeposits: 2,
     pendingCount: 1,
@@ -55,7 +65,7 @@ describe('AppComponent', () => {
     depositServiceMock = jasmine.createSpyObj('DepositService', ['getDeposits', 'createDeposit', 'reconcileDeposit', 'getAuditLogs', 'exportDepositsToCsv']);
     dashboardServiceMock = jasmine.createSpyObj('DashboardService', ['getSummary']);
 
-    depositServiceMock.getDeposits.and.returnValue(of(mockDeposits));
+    depositServiceMock.getDeposits.and.returnValue(of(mockPagedDeposits));
     depositServiceMock.getAuditLogs.and.returnValue(of([]));
     depositServiceMock.exportDepositsToCsv.and.returnValue(of(new Blob(['test'], { type: 'text/csv' })));
     dashboardServiceMock.getSummary.and.returnValue(of(mockDashboard));
@@ -280,6 +290,97 @@ describe('AppComponent', () => {
 
       expect(component.isExporting()).toBeFalse();
       expect(component.errorMessage()).toBeTruthy();
+    });
+  });
+
+  describe('Server-Side Pagination', () => {
+    it('should initialize pagination signals from paged response', () => {
+      expect(component.currentPage()).toBe(1);
+      expect(component.pageSize()).toBe(10);
+      expect(component.totalCount()).toBe(2);
+      expect(component.totalPages()).toBe(1);
+      expect(component.hasPreviousPage()).toBeFalse();
+      expect(component.hasNextPage()).toBeFalse();
+    });
+
+    it('should navigate to valid page on goToPage', () => {
+      // Simulate multiple pages
+      component.totalPages.set(3);
+      component.currentPage.set(1);
+
+      component.goToPage(2);
+
+      expect(component.currentPage()).toBe(2);
+      expect(depositServiceMock.getDeposits).toHaveBeenCalledWith(jasmine.objectContaining({ pageNumber: 2 }));
+    });
+
+    it('should ignore goToPage if target page is invalid or current', () => {
+      component.totalPages.set(3);
+      component.currentPage.set(2);
+      depositServiceMock.getDeposits.calls.reset();
+
+      component.goToPage(0);
+      expect(depositServiceMock.getDeposits).not.toHaveBeenCalled();
+
+      component.goToPage(4);
+      expect(depositServiceMock.getDeposits).not.toHaveBeenCalled();
+
+      component.goToPage(2);
+      expect(depositServiceMock.getDeposits).not.toHaveBeenCalled();
+    });
+
+    it('should advance to next page on nextPage when hasNextPage is true', () => {
+      component.totalPages.set(3);
+      component.currentPage.set(1);
+      component.hasNextPage.set(true);
+
+      component.nextPage();
+
+      expect(component.currentPage()).toBe(2);
+      expect(depositServiceMock.getDeposits).toHaveBeenCalledWith(jasmine.objectContaining({ pageNumber: 2 }));
+    });
+
+    it('should navigate to previous page on previousPage when hasPreviousPage is true', () => {
+      component.totalPages.set(3);
+      component.currentPage.set(2);
+      component.hasPreviousPage.set(true);
+
+      component.previousPage();
+
+      expect(component.currentPage()).toBe(1);
+      expect(depositServiceMock.getDeposits).toHaveBeenCalledWith(jasmine.objectContaining({ pageNumber: 1 }));
+    });
+
+    it('should update pageSize, reset to page 1, and reload deposits on onPageSizeChange', () => {
+      component.currentPage.set(3);
+      const fakeEvent = {
+        target: { value: '25' }
+      } as unknown as Event;
+
+      component.onPageSizeChange(fakeEvent);
+
+      expect(component.pageSize()).toBe(25);
+      expect(component.currentPage()).toBe(1);
+      expect(depositServiceMock.getDeposits).toHaveBeenCalledWith(jasmine.objectContaining({ pageNumber: 1, pageSize: 25 }));
+    });
+
+    it('should calculate pageRangeStart and pageRangeEnd correctly', () => {
+      component.totalCount.set(25);
+      component.currentPage.set(2);
+      component.pageSize.set(10);
+
+      expect(component.pageRangeStart()).toBe(11);
+      expect(component.pageRangeEnd()).toBe(20);
+    });
+
+    it('should reset currentPage to 1 when filters are applied or cleared', () => {
+      component.currentPage.set(3);
+      component.applyFilters();
+      expect(component.currentPage()).toBe(1);
+
+      component.currentPage.set(2);
+      component.clearFilters();
+      expect(component.currentPage()).toBe(1);
     });
   });
 });

@@ -30,6 +30,18 @@ export interface DepositFilter {
   status?: string;
   startDate?: string;
   endDate?: string;
+  pageNumber?: number;
+  pageSize?: number;
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
 }
 
 export interface DashboardSummary {

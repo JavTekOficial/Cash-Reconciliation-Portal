@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { CreateDepositRequest, Deposit, DepositAuditLog, DepositFilter, ReconcileDepositRequest } from '../models/deposit.model';
+import { CreateDepositRequest, Deposit, DepositAuditLog, DepositFilter, PagedResult, ReconcileDepositRequest } from '../models/deposit.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class DepositService {
 
   constructor(private readonly http: HttpClient) {}
 
-  getDeposits(filters?: DepositFilter): Observable<Deposit[]> {
+  getDeposits(filters?: DepositFilter): Observable<PagedResult<Deposit>> {
     let params = new HttpParams();
 
     if (filters) {
@@ -31,9 +31,15 @@ export class DepositService {
       if (filters.endDate) {
         params = params.set('endDate', filters.endDate);
       }
+      if (filters.pageNumber) {
+        params = params.set('pageNumber', filters.pageNumber.toString());
+      }
+      if (filters.pageSize) {
+        params = params.set('pageSize', filters.pageSize.toString());
+      }
     }
 
-    return this.http.get<Deposit[]>(this.baseUrl, { params });
+    return this.http.get<PagedResult<Deposit>>(this.baseUrl, { params });
   }
 
   getDepositById(id: number): Observable<Deposit> {

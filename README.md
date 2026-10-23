@@ -193,13 +193,41 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
 | `PUT` | `/api/deposits/{id}/reconcile` | Conciliar depósito ingresando monto real | `200 OK`, `400 Bad Request`, `404 Not Found` |
 | `GET` | `/api/dashboard` | Métricas consolidadas del dashboard (soporta filtros de búsqueda) | `200 OK` |
 
-### Parámetros de Filtro en `GET /api/deposits`
+### Parámetros de Consulta y Filtro en `GET /api/deposits`
 
 * `depositNumber` (string): Búsqueda parcial por número de depósito.
 * `storeNumber` (string): Búsqueda parcial por tienda.
 * `status` (string): Filtrar por estado (`Pending`, `Reconciled`, `Over`, `Short`).
 * `startDate` (DateTime): Fecha mínima de depósito.
 * `endDate` (DateTime): Fecha máxima de depósito.
+* `pageNumber` (int, por defecto `1`, mín `1`): Número de página solicitada para paginación en servidor.
+* `pageSize` (int, por defecto `10`, mín `1`, máx `100`): Cantidad de registros por página.
+
+#### Estructura de Respuesta Paginada (`PagedResult<DepositDto>`)
+```json
+{
+  "items": [
+    {
+      "depositId": 1,
+      "depositNumber": "DEP1001",
+      "storeNumber": "ST001",
+      "expectedAmount": 5000.00,
+      "actualAmount": 5000.00,
+      "variance": 0.00,
+      "status": "Reconciled",
+      "depositDate": "2026-10-23T04:00:00",
+      "reconciledAt": "2026-10-23T04:30:00",
+      "createdAt": "2026-10-23T04:00:00"
+    }
+  ],
+  "pageNumber": 1,
+  "pageSize": 10,
+  "totalCount": 25,
+  "totalPages": 3,
+  "hasPreviousPage": false,
+  "hasNextPage": true
+}
+```
 
 ### Ejemplos de Peticiones y Respuestas
 
@@ -320,7 +348,7 @@ DEP1002,ST002,2026-10-23 04:00:00,4250.00,,,Pending,,2026-10-23 04:00:00
 ## Ejecución de Pruebas Automatizadas
 
 ### Pruebas Unitarias del Backend (xUnit + Moq)
-El proyecto [BackEnd.Tests](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/BackEnd.Tests) contiene 13 pruebas unitarias exhaustivas para la capa de servicios, reglas de conciliación, auditoría y exportación:
+El proyecto [BackEnd.Tests](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/BackEnd.Tests) contiene 14 pruebas unitarias exhaustivas para la capa de servicios, reglas de conciliación, auditoría, exportación y paginación:
 ```powershell
 dotnet test BackEnd.Tests/BackEnd.Tests.csproj
 ```
@@ -337,9 +365,10 @@ dotnet test BackEnd.Tests/BackEnd.Tests.csproj
 * Re-conciliación subsecuente registra evento de auditoría (`Action = "Re-Reconciled"`) capturando valores previos.
 * Obtención de registros de auditoría por depósito mapeados a DTOs.
 * Exportación a CSV con codificación UTF-8 BOM, cabeceras normalizadas y escapado de caracteres especiales.
+* Paginación en servidor con cálculo de `TotalCount`, `TotalPages`, navegación anterior/siguiente y rebanado `Skip/Take`.
 
 ### Pruebas Unitarias del Frontend (Angular + Jasmine)
-El proyecto [FrontEnd](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/FrontEnd) incluye 15 pruebas unitarias exhaustivas:
+El proyecto [FrontEnd](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/FrontEnd) incluye 23 pruebas unitarias exhaustivas:
 ```powershell
 cd FrontEnd
 npm test -- --watch=false --browsers=ChromeHeadless
@@ -358,7 +387,7 @@ La aplicación soporta **Español** (idioma predeterminado) e **Inglés**:
 * **Arquitectura Reactiva**: Basada en Angular Signals (`currentLang = signal<SupportedLang>('es')`).
 * **Traducción en Plantillas**: Mediante el pipe `TranslatePipe` (`{{ 'DEPOSIT_NUMBER' | translate }}`).
 * **Persistencia**: La preferencia del usuario se almacena en el `localStorage` del navegador.
-* **Cobertura Total**: Textos de cabecera, tarjetas de KPI, filtros, columnas de tabla, botones de acción, estados (`Pendiente / Pending`, `Conciliado / Reconciled`, etc.) y mensajes de validación reactiva.
+* **Cobertura Total**: Textos de cabecera, tarjetas de KPI, filtros, columnas de tabla, botones de acción, estados (`Pendiente / Pending`, `Conciliado / Reconciled`, etc.), controles de paginación y mensajes de validación reactiva.
 
 ---
 
@@ -378,9 +407,9 @@ Cash Reconciliation Portal/
 │   │   └── HealthController.cs               # Health check del sistema
 │   ├── Data/
 │   │   └── CashReconciliationDbContext.cs    # EF Core DbContext, Fluent API y Seed Data
-│   ├── DTOs/                                 # Contratos de petición y respuesta
+│   ├── DTOs/                                 # Contratos de petición y respuesta (PagedResult, etc.)
 │   ├── Migrations/                           # Migraciones de EF Core
-│   ├── Models/                               # Entidades de dominio (Deposit, DepositStatus)
+│   ├── Models/                               # Entidades de dominio (Deposit, DepositAuditLog)
 │   ├── Repositories/                         # Abstracción y acceso a datos
 │   │   ├── IDepositRepository.cs
 │   │   └── DepositRepository.cs
@@ -395,12 +424,12 @@ Cash Reconciliation Portal/
     ├── package.json
     ├── src/
     │   ├── index.html                        # Carga de tipografías Outfit y Plus Jakarta Sans
-    │   ├── styles.css                        # Tokens globales, glassmorphism y diseño oscuro
+    │   ├── styles.css                        # Tokens globales, glassmorphism y diseño moderno
     │   └── app/
-    │       ├── app.component.ts              # Lógica principal, Signals y modales
+    │       ├── app.component.ts              # Lógica principal, Signals, paginación y modales
     │       ├── app.component.html            # Plantilla con diseño semántico y responsive
     │       ├── app.component.css             # Estilos de componentes y micro-animaciones
-    │       ├── app.component.spec.ts         # Pruebas unitarias de componentes
+    │       ├── app.component.spec.ts         # Pruebas unitarias de componentes (23 tests)
     │       ├── i18n/
     │       │   └── translations.ts           # Diccionarios bilingües completos (ES / EN)
     │       ├── models/
@@ -427,4 +456,5 @@ Para garantizar la máxima calidad y trazabilidad conforme a la especificación 
 6. `docs: add comprehensive project documentation, test suite and setup guide`
 7. `feat(audit): implement deposit audit trail logging, rest endpoint and ui timeline`
 8. `feat(export): implement server-side csv export with active filters and frontend download`
+9. `feat(pagination): implement server-side pagination with controls and paged results`
 

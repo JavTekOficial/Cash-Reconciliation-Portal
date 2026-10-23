@@ -25,6 +25,32 @@ public class DepositRepository : IDepositRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<PagedResult<Deposit>> GetPagedAsync(DepositFilterParams filters, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Deposits.AsNoTracking().AsQueryable();
+        query = ApplyFilters(query, filters);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var pageNumber = filters.PageNumber < 1 ? 1 : filters.PageNumber;
+        var pageSize = filters.PageSize < 1 ? 10 : (filters.PageSize > 100 ? 100 : filters.PageSize);
+
+        var items = await query
+            .OrderByDescending(d => d.DepositDate)
+            .ThenByDescending(d => d.DepositId)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<Deposit>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+    }
+
     private static IQueryable<Deposit> ApplyFilters(IQueryable<Deposit> query, DepositFilterParams? filters)
     {
         if (filters is null) return query;

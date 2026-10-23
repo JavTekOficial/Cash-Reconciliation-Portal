@@ -267,7 +267,7 @@
         <div>
           <h3 class="table-title">{{ 'DEPOSITS_TABLE_TITLE' | translate }}</h3>
           <p class="table-counter">
-            {{ 'SHOWING_RESULTS' | translate }} <strong>{{ deposits().length }}</strong> {{ 'RESULTS' | translate }}
+            {{ 'PAGINATION_SHOWING' | translate }} <strong>{{ pageRangeStart() }} - {{ pageRangeEnd() }}</strong> {{ 'PAGINATION_OF' | translate }} <strong>{{ totalCount() }}</strong> {{ 'PAGINATION_TOTAL_RECORDS' | translate }}
           </p>
         </div>
       </div>
@@ -389,6 +389,48 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- PAGINATION BAR -->
+      <div class="pagination-bar" *ngIf="totalCount() > 0">
+        <!-- Page size selector -->
+        <div class="pagination-page-size">
+          <label for="page-size-select">{{ 'PAGINATION_ITEMS_PER_PAGE' | translate }}:</label>
+          <select id="page-size-select" [value]="pageSize()" (change)="onPageSizeChange($event)" class="pagination-select">
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+            <option [value]="50">50</option>
+          </select>
+        </div>
+
+        <!-- Range indicator -->
+        <div class="pagination-range-info">
+          <span>{{ 'PAGINATION_PAGE' | translate }} <strong>{{ currentPage() }}</strong> {{ 'PAGINATION_OF' | translate }} <strong>{{ totalPages() }}</strong></span>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="pagination-controls">
+          <button type="button" class="btn-page-nav" [disabled]="!hasPreviousPage()" (click)="previousPage()" [title]="'PAGINATION_PREV' | translate" id="pagination-prev-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span class="nav-text">{{ 'PAGINATION_PREV' | translate }}</span>
+          </button>
+
+          <div class="pagination-numbers">
+            <button *ngFor="let page of visiblePages()" type="button" class="btn-page-num" [class.btn-page-num-active]="page === currentPage()" (click)="goToPage(page)" [id]="'pagination-page-' + page">
+              {{ page }}
+            </button>
+          </div>
+
+          <button type="button" class="btn-page-nav" [disabled]="!hasNextPage()" (click)="nextPage()" [title]="'PAGINATION_NEXT' | translate" id="pagination-next-btn">
+            <span class="nav-text">{{ 'PAGINATION_NEXT' | translate }}</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
       </div>
     </section>
 

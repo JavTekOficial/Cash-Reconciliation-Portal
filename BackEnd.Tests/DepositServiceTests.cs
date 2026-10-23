@@ -494,4 +494,52 @@ public class DepositServiceTests
         Assert.Contains("DEP-CSV-1,\"ST001, Main\",2026-10-20 10:30:00,1500.00,1550.00,50.00,Over,2026-10-20 14:00:00,2026-10-20 08:00:00", lines[1]);
         Assert.Contains("DEP-CSV-2,ST002,2026-10-21 11:00:00,2000.00,,,Pending,,2026-10-21 09:00:00", lines[2]);
     }
+
+    [Fact]
+    public async Task GetPagedDepositsAsync_ReturnsMappedPagedResult()
+    {
+        // Arrange
+        var filters = new DepositFilterParams
+        {
+            PageNumber = 2,
+            PageSize = 5
+        };
+
+        var pagedEntity = new PagedResult<Deposit>
+        {
+            Items = new List<Deposit>
+            {
+                new()
+                {
+                    DepositId = 6,
+                    DepositNumber = "DEP-PAGE-6",
+                    StoreNumber = "ST006",
+                    ExpectedAmount = 3000m,
+                    Status = DepositStatus.Pending,
+                    DepositDate = DateTime.UtcNow
+                }
+            },
+            TotalCount = 11,
+            PageNumber = 2,
+            PageSize = 5
+        };
+
+        _repositoryMock
+            .Setup(r => r.GetPagedAsync(filters, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(pagedEntity);
+
+        // Act
+        var result = await _service.GetPagedDepositsAsync(filters);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Single(result.Items);
+        Assert.Equal(11, result.TotalCount);
+        Assert.Equal(2, result.PageNumber);
+        Assert.Equal(5, result.PageSize);
+        Assert.Equal(3, result.TotalPages);
+        Assert.True(result.HasPreviousPage);
+        Assert.True(result.HasNextPage);
+        Assert.Equal("DEP-PAGE-6", result.Items.First().DepositNumber);
+    }
 }

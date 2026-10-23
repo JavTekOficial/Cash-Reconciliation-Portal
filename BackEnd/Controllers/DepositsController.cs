@@ -19,14 +19,14 @@ public class DepositsController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves deposits with optional filters (depositNumber, storeNumber, status, startDate, endDate).
+    /// Retrieves paged deposits with optional filters (depositNumber, storeNumber, status, startDate, endDate, pageNumber, pageSize).
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<DepositDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedResult<DepositDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get([FromQuery] DepositFilterParams filters, CancellationToken cancellationToken)
     {
-        var deposits = await _depositService.GetAllDepositsAsync(filters, cancellationToken);
-        return Ok(deposits);
+        var pagedResult = await _depositService.GetPagedDepositsAsync(filters, cancellationToken);
+        return Ok(pagedResult);
     }
 
     /// <summary>
