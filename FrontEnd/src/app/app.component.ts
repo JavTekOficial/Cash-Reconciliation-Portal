@@ -6,7 +6,7 @@ import { TranslationService } from './services/translation.service';
 import { DepositService } from './services/deposit.service';
 import { DashboardService } from './services/dashboard.service';
 import { SupportedLang } from './i18n/translations';
-import { Deposit, DashboardSummary, DepositFilter, DepositStatusType } from './models/deposit.model';
+import { Deposit, DashboardSummary, DepositFilter, DepositStatusType, DepositAuditLog } from './models/deposit.model';
 
 @Component({
   selector: 'app-root',
@@ -52,6 +52,12 @@ export class AppComponent implements OnInit {
   readonly isReconcileModalOpen = signal<boolean>(false);
   readonly selectedDeposit = signal<Deposit | null>(null);
   readonly reconcileActualAmount = signal<number | null>(null);
+
+  // Audit trail modal state
+  readonly isAuditModalOpen = signal<boolean>(false);
+  readonly selectedAuditDeposit = signal<Deposit | null>(null);
+  readonly auditLogs = signal<DepositAuditLog[]>([]);
+  readonly isLoadingAudit = signal<boolean>(false);
 
   // Filter Form
   filterDepositNumber = '';
@@ -296,6 +302,40 @@ export class AppComponent implements OnInit {
       case 'Over': return 'STATUS_OVER';
       case 'Short': return 'STATUS_SHORT';
       default: return 'STATUS_PENDING';
+    }
+  }
+
+  openAuditModal(deposit: Deposit): void {
+    this.selectedAuditDeposit.set(deposit);
+    this.isAuditModalOpen.set(true);
+    this.isLoadingAudit.set(true);
+    this.auditLogs.set([]);
+
+    this.depositService.getAuditLogs(deposit.depositId).subscribe({
+      next: (logs) => {
+        this.auditLogs.set(logs);
+        this.isLoadingAudit.set(false);
+      },
+      error: (err) => {
+        console.error('Error fetching audit logs', err);
+        this.isLoadingAudit.set(false);
+        this.errorMessage.set(this.i18n.translate('ERROR_GENERIC'));
+      }
+    });
+  }
+
+  closeAuditModal(): void {
+    this.isAuditModalOpen.set(false);
+    this.selectedAuditDeposit.set(null);
+    this.auditLogs.set([]);
+  }
+
+  getAuditActionTranslationKey(action: string): string {
+    switch (action) {
+      case 'Created': return 'AUDIT_ACTION_CREATED';
+      case 'Reconciled': return 'AUDIT_ACTION_RECONCILED';
+      case 'Re-Reconciled': return 'AUDIT_ACTION_RERECONCILED';
+      default: return action;
     }
   }
 }

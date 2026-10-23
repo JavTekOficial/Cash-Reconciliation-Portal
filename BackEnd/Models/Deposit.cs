@@ -21,4 +21,6 @@ public class Deposit
     public DateTime? ReconciledAt { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public virtual ICollection<DepositAuditLog> AuditLogs { get; set; } = new List<DepositAuditLog>();
 }

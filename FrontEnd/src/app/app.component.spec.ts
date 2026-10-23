@@ -52,10 +52,11 @@ describe('AppComponent', () => {
   };
 
   beforeEach(async () => {
-    depositServiceMock = jasmine.createSpyObj('DepositService', ['getDeposits', 'createDeposit', 'reconcileDeposit']);
+    depositServiceMock = jasmine.createSpyObj('DepositService', ['getDeposits', 'createDeposit', 'reconcileDeposit', 'getAuditLogs']);
     dashboardServiceMock = jasmine.createSpyObj('DashboardService', ['getSummary']);
 
     depositServiceMock.getDeposits.and.returnValue(of(mockDeposits));
+    depositServiceMock.getAuditLogs.and.returnValue(of([]));
     dashboardServiceMock.getSummary.and.returnValue(of(mockDashboard));
 
     await TestBed.configureTestingModule({
@@ -203,6 +204,59 @@ describe('AppComponent', () => {
 
       expect(component.hasActiveFilters()).toBeTrue();
       expect(dashboardServiceMock.getSummary).toHaveBeenCalledWith(jasmine.objectContaining({ status: 'Short' }));
+    });
+  });
+
+  describe('Audit Trail Modal', () => {
+    const testDeposit: Deposit = {
+      depositId: 101,
+      depositNumber: 'DEP-AUDIT-101',
+      storeNumber: 'ST05',
+      expectedAmount: 1200.0,
+      actualAmount: 1200.0,
+      variance: 0.0,
+      status: 'Reconciled',
+      depositDate: '2026-03-01T10:00:00Z',
+      reconciledAt: '2026-03-01T12:00:00Z',
+      createdAt: '2026-03-01T08:00:00Z'
+    };
+
+    it('should open audit modal and load audit logs', () => {
+      depositServiceMock.getAuditLogs.and.returnValue(of([
+        {
+          auditLogId: 1,
+          depositId: 101,
+          action: 'Created',
+          previousActualAmount: null,
+          newActualAmount: null,
+          previousVariance: null,
+          newVariance: null,
+          previousStatus: null,
+          newStatus: 'Pending',
+          performedBy: 'Operador de Bóveda',
+          notes: 'Depósito registrado',
+          timestamp: '2026-03-01T08:00:00Z'
+        }
+      ]));
+
+      component.openAuditModal(testDeposit);
+
+      expect(component.isAuditModalOpen()).toBeTrue();
+      expect(component.selectedAuditDeposit()).toEqual(testDeposit);
+      expect(depositServiceMock.getAuditLogs).toHaveBeenCalledWith(101);
+      expect(component.auditLogs().length).toBe(1);
+      expect(component.isLoadingAudit()).toBeFalse();
+    });
+
+    it('should close audit modal and reset selectedAuditDeposit and auditLogs', () => {
+      component.selectedAuditDeposit.set(testDeposit);
+      component.isAuditModalOpen.set(true);
+
+      component.closeAuditModal();
+
+      expect(component.isAuditModalOpen()).toBeFalse();
+      expect(component.selectedAuditDeposit()).toBeNull();
+      expect(component.auditLogs().length).toBe(0);
     });
   });
 });

@@ -187,9 +187,10 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
 | `GET` | `/api/health` | Verificación de disponibilidad del servicio | `200 OK` |
 | `GET` | `/api/deposits` | Listado paginado/filtrado de depósitos | `200 OK` |
 | `GET` | `/api/deposits/{id}` | Obtener detalle de un depósito por su ID | `200 OK`, `404 Not Found` |
+| `GET` | `/api/deposits/{id}/audit-logs` | Historial cronológico de auditoría (*Audit Trail*) | `200 OK`, `404 Not Found` |
 | `POST` | `/api/deposits` | Registrar un nuevo depósito en bóveda | `201 Created`, `400 Bad Request` |
 | `PUT` | `/api/deposits/{id}/reconcile` | Conciliar depósito ingresando monto real | `200 OK`, `400 Bad Request`, `404 Not Found` |
-| `GET` | `/api/dashboard` | Métricas consolidadas del dashboard | `200 OK` |
+| `GET` | `/api/dashboard` | Métricas consolidadas del dashboard (soporta filtros de búsqueda) | `200 OK` |
 
 ### Parámetros de Filtro en `GET /api/deposits`
 
@@ -250,7 +251,42 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
 }
 ```
 
-#### 3. Resumen de Dashboard (`GET /api/dashboard`)
+#### 3. Consultar Registro de Auditoría (`GET /api/deposits/{id}/audit-logs`)
+**Response (`200 OK`):**
+```json
+[
+  {
+    "auditLogId": 2,
+    "depositId": 6,
+    "action": "Reconciled",
+    "previousActualAmount": null,
+    "newActualAmount": 2450.00,
+    "previousVariance": null,
+    "newVariance": -50.00,
+    "previousStatus": "Pending",
+    "newStatus": "Short",
+    "performedBy": "Operador de Bóveda",
+    "notes": "Conciliación inicial de depósito",
+    "timestamp": "2026-10-23T16:30:00.000Z"
+  },
+  {
+    "auditLogId": 1,
+    "depositId": 6,
+    "action": "Created",
+    "previousActualAmount": null,
+    "newActualAmount": null,
+    "previousVariance": null,
+    "newVariance": null,
+    "previousStatus": null,
+    "newStatus": "Pending",
+    "performedBy": "Operador de Bóveda",
+    "notes": "Depósito registrado con monto esperado de $2,500.00",
+    "timestamp": "2026-10-23T16:25:00.000Z"
+  }
+]
+```
+
+#### 4. Resumen de Dashboard (`GET /api/dashboard`)
 **Response (`200 OK`):**
 ```json
 {
@@ -270,7 +306,7 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
 ## Ejecución de Pruebas Automatizadas
 
 ### Pruebas Unitarias del Backend (xUnit + Moq)
-El proyecto [BackEnd.Tests](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/BackEnd.Tests) contiene pruebas unitarias exhaustivas para la capa de servicios y reglas de conciliación:
+El proyecto [BackEnd.Tests](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/BackEnd.Tests) contiene 12 pruebas unitarias exhaustivas para la capa de servicios, reglas de conciliación y registro de auditoría:
 ```powershell
 dotnet test BackEnd.Tests/BackEnd.Tests.csproj
 ```
@@ -281,9 +317,14 @@ dotnet test BackEnd.Tests/BackEnd.Tests.csproj
 * Intento de conciliación de depósito inexistente $\rightarrow$ Retorna `null`.
 * Registro con número de depósito duplicado $\rightarrow$ Lanza `InvalidOperationException`.
 * Registro válido $\rightarrow$ Guarda con estado `Pending` y campos auditados.
-* Métricas de dashboard consolidadas.
+* Métricas de dashboard consolidadas (global y con filtros).
+* Creación de depósito registra evento de auditoría inicial (`Action = "Created"`).
+* Conciliación inicial registra evento de auditoría (`Action = "Reconciled"`).
+* Re-conciliación subsecuente registra evento de auditoría (`Action = "Re-Reconciled"`) capturando valores previos.
+* Obtención de registros de auditoría por depósito mapeados a DTOs.
 
 ### Pruebas Unitarias del Frontend (Angular + Jasmine)
+El proyecto [FrontEnd](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/FrontEnd) incluye 13 pruebas unitarias exhaustivas:
 ```powershell
 cd FrontEnd
 npm test -- --watch=false --browsers=ChromeHeadless
@@ -369,3 +410,5 @@ Para garantizar la máxima calidad y trazabilidad conforme a la especificación 
 4. `feat(frontend): initialize angular app with i18n translation service and http clients`
 5. `feat(frontend): implement dashboard, deposit table, search filters and modals`
 6. `docs: add comprehensive project documentation, test suite and setup guide`
+7. `feat(audit): implement deposit audit trail logging, rest endpoint and ui timeline`
+

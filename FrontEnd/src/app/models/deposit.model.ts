@@ -42,3 +42,19 @@ export interface DashboardSummary {
   totalExpectedAmount: number;
   totalActualAmount: number;
 }
+
+export interface DepositAuditLog {
+  auditLogId: number;
+  depositId: number;
+  action: string;
+  previousActualAmount: number | null;
+  newActualAmount: number | null;
+  previousVariance: number | null;
+  newVariance: number | null;
+  previousStatus: string | null;
+  newStatus: string;
+  performedBy: string;
+  notes: string | null;
+  timestamp: string;
+}
+

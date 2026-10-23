@@ -51,6 +51,22 @@ public class DepositService : IDepositService
         var created = await _repository.AddAsync(deposit, cancellationToken);
         _logger.LogInformation("Deposit {DepositNumber} created successfully with ID {DepositId}", created.DepositNumber, created.DepositId);
 
+        var auditLog = new DepositAuditLog
+        {
+            DepositId = created.DepositId,
+            Action = "Created",
+            PreviousActualAmount = null,
+            NewActualAmount = null,
+            PreviousVariance = null,
+            NewVariance = null,
+            PreviousStatus = null,
+            NewStatus = DepositStatus.Pending,
+            PerformedBy = "Operador de Bóveda",
+            Notes = $"Depósito registrado con monto esperado de {created.ExpectedAmount:C}",
+            Timestamp = DateTime.UtcNow
+        };
+        await _repository.AddAuditLogAsync(auditLog, cancellationToken);
+
         return MapToDto(created);
     }
 
@@ -61,6 +77,12 @@ public class DepositService : IDepositService
         {
             return null;
         }
+
+        // Snapshot previous values for audit logging
+        var previousActual = deposit.ActualAmount;
+        var previousVariance = deposit.Variance;
+        var previousStatus = deposit.Status;
+        var isReReconciliation = deposit.Status != DepositStatus.Pending;
 
         // Reglas de Negocio de Conciliación
         // Cálculo de Varianza = Monto Real - Monto Esperado
@@ -84,6 +106,22 @@ public class DepositService : IDepositService
 
         await _repository.UpdateAsync(deposit, cancellationToken);
 
+        var auditLog = new DepositAuditLog
+        {
+            DepositId = deposit.DepositId,
+            Action = isReReconciliation ? "Re-Reconciled" : "Reconciled",
+            PreviousActualAmount = previousActual,
+            NewActualAmount = deposit.ActualAmount,
+            PreviousVariance = previousVariance,
+            NewVariance = deposit.Variance,
+            PreviousStatus = previousStatus,
+            NewStatus = deposit.Status,
+            PerformedBy = "Operador de Bóveda",
+            Notes = isReReconciliation ? "Ajuste de conciliación existente" : "Conciliación inicial de depósito",
+            Timestamp = DateTime.UtcNow
+        };
+        await _repository.AddAuditLogAsync(auditLog, cancellationToken);
+
         _logger.LogInformation("Deposit {DepositId} reconciled. Expected: {Expected}, Actual: {Actual}, Variance: {Variance}, Status: {Status}",
             id, deposit.ExpectedAmount, request.ActualAmount, variance, status);
 
@@ -93,6 +131,12 @@ public class DepositService : IDepositService
     public async Task<DashboardSummaryDto> GetDashboardSummaryAsync(DepositFilterParams? filters = null, CancellationToken cancellationToken = default)
     {
         return await _repository.GetDashboardMetricsAsync(filters, cancellationToken);
+    }
+
+    public async Task<IEnumerable<DepositAuditLogDto>> GetAuditLogsAsync(int depositId, CancellationToken cancellationToken = default)
+    {
+        var logs = await _repository.GetAuditLogsByDepositIdAsync(depositId, cancellationToken);
+        return logs.Select(MapAuditLogToDto);
     }
 
     private static DepositDto MapToDto(Deposit entity) => new()
@@ -107,5 +151,21 @@ public class DepositService : IDepositService
         DepositDate = entity.DepositDate,
         ReconciledAt = entity.ReconciledAt,
         CreatedAt = entity.CreatedAt
+    };
+
+    private static DepositAuditLogDto MapAuditLogToDto(DepositAuditLog entity) => new()
+    {
+        AuditLogId = entity.AuditLogId,
+        DepositId = entity.DepositId,
+        Action = entity.Action,
+        PreviousActualAmount = entity.PreviousActualAmount,
+        NewActualAmount = entity.NewActualAmount,
+        PreviousVariance = entity.PreviousVariance,
+        NewVariance = entity.NewVariance,
+        PreviousStatus = entity.PreviousStatus,
+        NewStatus = entity.NewStatus,
+        PerformedBy = entity.PerformedBy,
+        Notes = entity.Notes,
+        Timestamp = entity.Timestamp
     };
 }

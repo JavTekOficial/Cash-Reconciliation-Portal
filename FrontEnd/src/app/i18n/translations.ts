@@ -95,7 +95,21 @@ export const TRANSLATIONS: Record<SupportedLang, Record<string, string>> = {
     'SUCCESS_RECONCILED': 'Depósito conciliado exitosamente.',
     'ERROR_GENERIC': 'Ocurrió un error. Por favor intente nuevamente.',
     'LOADING': 'Cargando información...',
-    'CLOSE': 'Cerrar'
+    'CLOSE': 'Cerrar',
+
+    // Audit Trail
+    'AUDIT_TRAIL_BTN': 'Historial',
+    'AUDIT_MODAL_TITLE': 'Registro de Auditoría y Trazabilidad',
+    'AUDIT_MODAL_SUBTITLE': 'Historial cronológico de cambios de estado y conciliación de la bolsa de depósito.',
+    'AUDIT_ACTION_CREATED': 'Registro Inicial',
+    'AUDIT_ACTION_RECONCILED': 'Conciliación Inicial',
+    'AUDIT_ACTION_RERECONCILED': 'Re-conciliación',
+    'AUDIT_LOG_EMPTY': 'No hay eventos registrados en la auditoría para este depósito.',
+    'AUDIT_OPERATOR': 'Operador',
+    'AUDIT_PREVIOUS': 'Anterior',
+    'AUDIT_NEW': 'Nuevo',
+    'AUDIT_NOTES': 'Detalle / Observaciones',
+    'AUDIT_TIMESTAMP': 'Fecha y Hora'
   },
   en: {
     // Header & Brand
@@ -191,6 +205,20 @@ export const TRANSLATIONS: Record<SupportedLang, Record<string, string>> = {
     'SUCCESS_RECONCILED': 'Deposit reconciled successfully.',
     'ERROR_GENERIC': 'An error occurred. Please try again.',
     'LOADING': 'Loading information...',
-    'CLOSE': 'Close'
+    'CLOSE': 'Close',
+
+    // Audit Trail
+    'AUDIT_TRAIL_BTN': 'History',
+    'AUDIT_MODAL_TITLE': 'Audit Trail & Event History',
+    'AUDIT_MODAL_SUBTITLE': 'Chronological history of status transitions and reconciliations for this deposit bag.',
+    'AUDIT_ACTION_CREATED': 'Deposit Created',
+    'AUDIT_ACTION_RECONCILED': 'Initial Reconciliation',
+    'AUDIT_ACTION_RERECONCILED': 'Re-Reconciliation',
+    'AUDIT_LOG_EMPTY': 'No audit trail events recorded for this deposit.',
+    'AUDIT_OPERATOR': 'Operator',
+    'AUDIT_PREVIOUS': 'Previous',
+    'AUDIT_NEW': 'New',
+    'AUDIT_NOTES': 'Notes / Details',
+    'AUDIT_TIMESTAMP': 'Timestamp'
   }
 };

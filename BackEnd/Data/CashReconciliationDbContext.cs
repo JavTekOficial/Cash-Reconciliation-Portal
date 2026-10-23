@@ -11,6 +11,7 @@ public class CashReconciliationDbContext : DbContext
     }
 
     public DbSet<Deposit> Deposits => Set<Deposit>();
+    public DbSet<DepositAuditLog> DepositAuditLogs => Set<DepositAuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -127,6 +128,55 @@ public class CashReconciliationDbContext : DbContext
                     CreatedAt = new DateTime(2026, 10, 22, 8, 30, 0, DateTimeKind.Utc)
                 }
             );
+        });
+
+        modelBuilder.Entity<DepositAuditLog>(entity =>
+        {
+            entity.ToTable("DepositAuditLogs");
+
+            entity.HasKey(a => a.AuditLogId);
+
+            entity.Property(a => a.Action)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(a => a.PreviousActualAmount)
+                .HasPrecision(18, 2);
+
+            entity.Property(a => a.NewActualAmount)
+                .HasPrecision(18, 2);
+
+            entity.Property(a => a.PreviousVariance)
+                .HasPrecision(18, 2);
+
+            entity.Property(a => a.NewVariance)
+                .HasPrecision(18, 2);
+
+            entity.Property(a => a.PreviousStatus)
+                .HasMaxLength(20);
+
+            entity.Property(a => a.NewStatus)
+                .IsRequired()
+                .HasMaxLength(20);
+
+            entity.Property(a => a.PerformedBy)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(a => a.Notes)
+                .HasMaxLength(255);
+
+            entity.Property(a => a.Timestamp)
+                .IsRequired()
+                .HasColumnType("datetime2");
+
+            entity.HasIndex(a => a.DepositId);
+            entity.HasIndex(a => a.Timestamp);
+
+            entity.HasOne(a => a.Deposit)
+                .WithMany(d => d.AuditLogs)
+                .HasForeignKey(a => a.DepositId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

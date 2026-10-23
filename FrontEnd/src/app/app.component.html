@@ -329,25 +329,37 @@
 
               <!-- Actions -->
               <td class="text-center">
-                <button type="button" class="btn-reconcile-action"
-                  [ngClass]="{'btn-re-reconcile': item.status !== 'Pending'}" (click)="openReconcileModal(item)"
-                  [id]="'reconcile-btn-' + item.depositId"
-                  [title]="item.status === 'Pending' ? ('RECONCILE_BTN' | translate) : ('RE_RECONCILE_BTN' | translate)">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <rect x="4" y="2" width="16" height="20" rx="2" />
-                    <line x1="8" y1="6" x2="16" y2="6" />
-                    <line x1="16" y1="14" x2="16" y2="18" />
-                    <path d="M16 10h.01" />
-                    <path d="M12 10h.01" />
-                    <path d="M8 10h.01" />
-                    <path d="M12 14h.01" />
-                    <path d="M8 14h.01" />
-                    <path d="M12 18h.01" />
-                    <path d="M8 18h.01" />
-                  </svg>
-                  <span>{{ item.status === 'Pending' ? ('RECONCILE_BTN' | translate) : ('RE_RECONCILE_BTN' | translate)
-                    }}</span>
-                </button>
+                <div class="action-buttons-group">
+                  <button type="button" class="btn-reconcile-action"
+                    [ngClass]="{'btn-re-reconcile': item.status !== 'Pending'}" (click)="openReconcileModal(item)"
+                    [id]="'reconcile-btn-' + item.depositId"
+                    [title]="item.status === 'Pending' ? ('RECONCILE_BTN' | translate) : ('RE_RECONCILE_BTN' | translate)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <rect x="4" y="2" width="16" height="20" rx="2" />
+                      <line x1="8" y1="6" x2="16" y2="6" />
+                      <line x1="16" y1="14" x2="16" y2="18" />
+                      <path d="M16 10h.01" />
+                      <path d="M12 10h.01" />
+                      <path d="M8 10h.01" />
+                      <path d="M12 14h.01" />
+                      <path d="M8 14h.01" />
+                      <path d="M12 18h.01" />
+                      <path d="M8 18h.01" />
+                    </svg>
+                    <span>{{ item.status === 'Pending' ? ('RECONCILE_BTN' | translate) : ('RE_RECONCILE_BTN' | translate)
+                      }}</span>
+                  </button>
+
+                  <button type="button" class="btn-audit-action" (click)="openAuditModal(item)"
+                    [id]="'audit-btn-' + item.depositId"
+                    [title]="'AUDIT_TRAIL_BTN' | translate">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>{{ 'AUDIT_TRAIL_BTN' | translate }}</span>
+                  </button>
+                </div>
               </td>
             </tr>
 
@@ -685,6 +697,149 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUDIT TRAIL MODAL -->
+  <div class="modal-backdrop" *ngIf="isAuditModalOpen()" (click)="closeAuditModal()">
+    <div class="modal-dialog modal-card modal-audit" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title">{{ 'AUDIT_MODAL_TITLE' | translate }}</h3>
+            <p class="modal-subtitle">{{ 'AUDIT_MODAL_SUBTITLE' | translate }}</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" (click)="closeAuditModal()" aria-label="Close">✕</button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedAuditDeposit() as dep">
+        <!-- Deposit summary pill info -->
+        <div class="deposit-context-card">
+          <div class="context-item">
+            <span class="context-label">{{ 'TABLE_DEPOSIT_NO' | translate }}</span>
+            <span class="context-value highlight-number">{{ dep.depositNumber }}</span>
+          </div>
+          <div class="context-item">
+            <span class="context-label">{{ 'TABLE_STORE_NO' | translate }}</span>
+            <span class="context-value">{{ dep.storeNumber }}</span>
+          </div>
+          <div class="context-item">
+            <span class="context-label">{{ 'FIELD_EXPECTED_AMOUNT' | translate }}</span>
+            <span class="context-value highlight-amount">
+              {{ dep.expectedAmount | currency:'USD':'symbol':'1.2-2' }}
+            </span>
+          </div>
+          <div class="context-item">
+            <span class="context-label">{{ 'TABLE_STATUS' | translate }}</span>
+            <span class="status-badge" [ngClass]="getStatusClass(dep.status)">
+              <span class="badge-dot"></span>
+              {{ getStatusTranslationKey(dep.status) | translate }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Audit Timeline loading state -->
+        <div *ngIf="isLoadingAudit()" class="audit-loading">
+          <span class="spinner-small"></span>
+          <span>{{ 'LOADING' | translate }}</span>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="!isLoadingAudit() && auditLogs().length === 0" class="audit-empty-state">
+          <p>{{ 'AUDIT_LOG_EMPTY' | translate }}</p>
+        </div>
+
+        <!-- Timeline container -->
+        <div *ngIf="!isLoadingAudit() && auditLogs().length > 0" class="audit-timeline">
+          <div *ngFor="let log of auditLogs(); let i = index" class="timeline-item">
+            <div class="timeline-marker">
+              <div class="marker-dot" [ngClass]="{
+                'dot-created': log.action === 'Created',
+                'dot-reconciled': log.action === 'Reconciled',
+                'dot-rereconciled': log.action === 'Re-Reconciled'
+              }"></div>
+              <div class="marker-line" *ngIf="i < auditLogs().length - 1"></div>
+            </div>
+
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div class="timeline-action-pill" [ngClass]="{
+                  'action-created': log.action === 'Created',
+                  'action-reconciled': log.action === 'Reconciled',
+                  'action-rereconciled': log.action === 'Re-Reconciled'
+                }">
+                  {{ getAuditActionTranslationKey(log.action) | translate }}
+                </div>
+                <span class="timeline-time">{{ log.timestamp | date:'yyyy-MM-dd HH:mm:ss' }} UTC</span>
+              </div>
+
+              <div class="timeline-meta-row">
+                <span class="operator-tag">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                  {{ log.performedBy }}
+                </span>
+                <span *ngIf="log.notes" class="log-notes">{{ log.notes }}</span>
+              </div>
+
+              <!-- State changes details -->
+              <div class="timeline-changes-grid" *ngIf="log.action !== 'Created'">
+                <div class="change-box">
+                  <span class="change-label">{{ 'STATUS' | translate }}</span>
+                  <div class="change-values">
+                    <span class="status-badge status-badge-sm" [ngClass]="getStatusClass(log.previousStatus || 'Pending')">
+                      {{ getStatusTranslationKey(log.previousStatus || 'Pending') | translate }}
+                    </span>
+                    <span class="arrow-indicator">➔</span>
+                    <span class="status-badge status-badge-sm" [ngClass]="getStatusClass(log.newStatus)">
+                      {{ getStatusTranslationKey(log.newStatus) | translate }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="change-box">
+                  <span class="change-label">{{ 'TABLE_ACTUAL' | translate }}</span>
+                  <div class="change-values">
+                    <span class="val-prev">{{ log.previousActualAmount !== null ? (log.previousActualAmount | currency:'USD':'symbol':'1.2-2') : '—' }}</span>
+                    <span class="arrow-indicator">➔</span>
+                    <span class="val-new font-semibold">{{ log.newActualAmount !== null ? (log.newActualAmount | currency:'USD':'symbol':'1.2-2') : '—' }}</span>
+                  </div>
+                </div>
+
+                <div class="change-box">
+                  <span class="change-label">{{ 'TABLE_VARIANCE' | translate }}</span>
+                  <div class="change-values">
+                    <span class="val-prev">{{ log.previousVariance !== null ? ((log.previousVariance >= 0 ? '+' : '') + (log.previousVariance | currency:'USD':'symbol':'1.2-2')) : '—' }}</span>
+                    <span class="arrow-indicator">➔</span>
+                    <span class="val-new font-semibold" [ngClass]="{
+                      'text-reconciled': log.newVariance === 0,
+                      'text-over': log.newVariance !== null && log.newVariance > 0,
+                      'text-short': log.newVariance !== null && log.newVariance < 0
+                    }">
+                      {{ log.newVariance !== null ? ((log.newVariance >= 0 ? '+' : '') + (log.newVariance | currency:'USD':'symbol':'1.2-2')) : '—' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeAuditModal()">
+            {{ 'CLOSE' | translate }}
+          </button>
+        </div>
       </div>
     </div>
   </div>

@@ -12,4 +12,6 @@ public interface IDepositRepository
     Task<Deposit> AddAsync(Deposit deposit, CancellationToken cancellationToken = default);
     Task UpdateAsync(Deposit deposit, CancellationToken cancellationToken = default);
     Task<DashboardSummaryDto> GetDashboardMetricsAsync(DepositFilterParams? filters = null, CancellationToken cancellationToken = default);
+    Task<IEnumerable<DepositAuditLog>> GetAuditLogsByDepositIdAsync(int depositId, CancellationToken cancellationToken = default);
+    Task AddAuditLogAsync(DepositAuditLog auditLog, CancellationToken cancellationToken = default);
 }

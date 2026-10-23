@@ -94,4 +94,22 @@ public class DepositsController : ControllerBase
 
         return Ok(reconciled);
     }
+
+    /// <summary>
+    /// Retrieves the audit trail log history for a specific deposit.
+    /// </summary>
+    [HttpGet("{id:int}/audit-logs")]
+    [ProducesResponseType(typeof(IEnumerable<DepositAuditLogDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAuditLogs(int id, CancellationToken cancellationToken)
+    {
+        var deposit = await _depositService.GetDepositByIdAsync(id, cancellationToken);
+        if (deposit is null)
+        {
+            return NotFound(new { message = $"Deposit with ID {id} was not found." });
+        }
+
+        var logs = await _depositService.GetAuditLogsAsync(id, cancellationToken);
+        return Ok(logs);
+    }
 }

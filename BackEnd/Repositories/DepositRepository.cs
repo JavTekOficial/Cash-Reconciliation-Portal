@@ -112,4 +112,20 @@ public class DepositRepository : IDepositRepository
             TotalActualAmount = deposits.Where(d => d.ActualAmount.HasValue).Sum(d => d.ActualAmount!.Value)
         };
     }
+
+    public async Task<IEnumerable<DepositAuditLog>> GetAuditLogsByDepositIdAsync(int depositId, CancellationToken cancellationToken = default)
+    {
+        return await _context.DepositAuditLogs
+            .AsNoTracking()
+            .Where(a => a.DepositId == depositId)
+            .OrderByDescending(a => a.Timestamp)
+            .ThenByDescending(a => a.AuditLogId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task AddAuditLogAsync(DepositAuditLog auditLog, CancellationToken cancellationToken = default)
+    {
+        await _context.DepositAuditLogs.AddAsync(auditLog, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
 }

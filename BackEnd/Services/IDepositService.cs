@@ -9,4 +9,5 @@ public interface IDepositService
     Task<DepositDto> CreateDepositAsync(CreateDepositRequest request, CancellationToken cancellationToken = default);
     Task<DepositDto?> ReconcileDepositAsync(int id, ReconcileDepositRequest request, CancellationToken cancellationToken = default);
     Task<DashboardSummaryDto> GetDashboardSummaryAsync(DepositFilterParams? filters = null, CancellationToken cancellationToken = default);
+    Task<IEnumerable<DepositAuditLogDto>> GetAuditLogsAsync(int depositId, CancellationToken cancellationToken = default);
 }

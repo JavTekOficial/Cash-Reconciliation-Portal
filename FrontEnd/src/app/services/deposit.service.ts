@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { CreateDepositRequest, Deposit, DepositFilter, ReconcileDepositRequest } from '../models/deposit.model';
+import { CreateDepositRequest, Deposit, DepositAuditLog, DepositFilter, ReconcileDepositRequest } from '../models/deposit.model';
 
 @Injectable({
   providedIn: 'root'
@@ -38,6 +38,10 @@ export class DepositService {
 
   getDepositById(id: number): Observable<Deposit> {
     return this.http.get<Deposit>(`${this.baseUrl}/${id}`);
+  }
+
+  getAuditLogs(depositId: number): Observable<DepositAuditLog[]> {
+    return this.http.get<DepositAuditLog[]>(`${this.baseUrl}/${depositId}/audit-logs`);
   }
 
   createDeposit(deposit: CreateDepositRequest): Observable<Deposit> {

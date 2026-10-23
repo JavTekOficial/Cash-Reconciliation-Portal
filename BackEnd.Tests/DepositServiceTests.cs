@@ -273,4 +273,163 @@ public class DepositServiceTests
         Assert.Equal(-150.00m, result.TotalVariance);
         _repositoryMock.Verify(r => r.GetDashboardMetricsAsync(filters, It.IsAny<CancellationToken>()), Times.Once);
     }
+
+    [Fact]
+    public async Task CreateDepositAsync_RecordsAuditLog()
+    {
+        // Arrange
+        var request = new CreateDepositRequest
+        {
+            DepositNumber = "DEP-AUDIT-1",
+            StoreNumber = "ST007",
+            ExpectedAmount = 1500.00m,
+            DepositDate = DateTime.UtcNow
+        };
+
+        _repositoryMock
+            .Setup(r => r.ExistsAsync("DEP-AUDIT-1", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        _repositoryMock
+            .Setup(r => r.AddAsync(It.IsAny<Deposit>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Deposit d, CancellationToken _) =>
+            {
+                d.DepositId = 42;
+                return d;
+            });
+
+        // Act
+        var result = await _service.CreateDepositAsync(request);
+
+        // Assert
+        Assert.NotNull(result);
+        _repositoryMock.Verify(r => r.AddAuditLogAsync(It.Is<DepositAuditLog>(a =>
+            a.DepositId == 42 &&
+            a.Action == "Created" &&
+            a.PreviousActualAmount == null &&
+            a.NewActualAmount == null &&
+            a.NewStatus == DepositStatus.Pending &&
+            a.PerformedBy == "Operador de Bóveda"
+        ), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ReconcileDepositAsync_InitialReconciliation_RecordsAuditLogWithReconciledAction()
+    {
+        // Arrange
+        var deposit = new Deposit
+        {
+            DepositId = 55,
+            DepositNumber = "DEP-55",
+            StoreNumber = "ST002",
+            ExpectedAmount = 2000.00m,
+            ActualAmount = null,
+            Variance = null,
+            Status = DepositStatus.Pending
+        };
+
+        _repositoryMock
+            .Setup(r => r.GetByIdAsync(55, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(deposit);
+
+        var request = new ReconcileDepositRequest { ActualAmount = 2000.00m };
+
+        // Act
+        var result = await _service.ReconcileDepositAsync(55, request);
+
+        // Assert
+        Assert.NotNull(result);
+        _repositoryMock.Verify(r => r.AddAuditLogAsync(It.Is<DepositAuditLog>(a =>
+            a.DepositId == 55 &&
+            a.Action == "Reconciled" &&
+            a.PreviousActualAmount == null &&
+            a.NewActualAmount == 2000.00m &&
+            a.PreviousStatus == DepositStatus.Pending &&
+            a.NewStatus == DepositStatus.Reconciled &&
+            a.PreviousVariance == null &&
+            a.NewVariance == 0.00m
+        ), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ReconcileDepositAsync_SubsequentReconciliation_RecordsAuditLogWithReReconciledAction()
+    {
+        // Arrange
+        var deposit = new Deposit
+        {
+            DepositId = 56,
+            DepositNumber = "DEP-56",
+            StoreNumber = "ST002",
+            ExpectedAmount = 2000.00m,
+            ActualAmount = 1900.00m,
+            Variance = -100.00m,
+            Status = DepositStatus.Short
+        };
+
+        _repositoryMock
+            .Setup(r => r.GetByIdAsync(56, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(deposit);
+
+        var request = new ReconcileDepositRequest { ActualAmount = 2050.00m };
+
+        // Act
+        var result = await _service.ReconcileDepositAsync(56, request);
+
+        // Assert
+        Assert.NotNull(result);
+        _repositoryMock.Verify(r => r.AddAuditLogAsync(It.Is<DepositAuditLog>(a =>
+            a.DepositId == 56 &&
+            a.Action == "Re-Reconciled" &&
+            a.PreviousActualAmount == 1900.00m &&
+            a.NewActualAmount == 2050.00m &&
+            a.PreviousStatus == DepositStatus.Short &&
+            a.NewStatus == DepositStatus.Over &&
+            a.PreviousVariance == -100.00m &&
+            a.NewVariance == 50.00m
+        ), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetAuditLogsAsync_ReturnsMappedDtos()
+    {
+        // Arrange
+        var logs = new List<DepositAuditLog>
+        {
+            new()
+            {
+                AuditLogId = 1,
+                DepositId = 10,
+                Action = "Created",
+                NewStatus = DepositStatus.Pending,
+                Timestamp = DateTime.UtcNow.AddMinutes(-10)
+            },
+            new()
+            {
+                AuditLogId = 2,
+                DepositId = 10,
+                Action = "Reconciled",
+                PreviousStatus = DepositStatus.Pending,
+                NewStatus = DepositStatus.Reconciled,
+                PreviousActualAmount = null,
+                NewActualAmount = 1000m,
+                PreviousVariance = null,
+                NewVariance = 0m,
+                Timestamp = DateTime.UtcNow
+            }
+        };
+
+        _repositoryMock
+            .Setup(r => r.GetAuditLogsByDepositIdAsync(10, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(logs);
+
+        // Act
+        var result = (await _service.GetAuditLogsAsync(10)).ToList();
+
+        // Assert
+        Assert.Equal(2, result.Count);
+        Assert.Equal(1, result[0].AuditLogId);
+        Assert.Equal("Created", result[0].Action);
+        Assert.Equal(2, result[1].AuditLogId);
+        Assert.Equal("Reconciled", result[1].Action);
+    }
 }
