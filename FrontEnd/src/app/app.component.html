@@ -4,13 +4,14 @@
     <div class="header-container">
       <div class="brand-group">
         <div class="vault-icon-badge">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <circle cx="12" cy="12" r="3"/>
-            <path d="m14.5 9.5 2-2"/>
-            <path d="m9.5 14.5-2 2"/>
-            <path d="m9.5 9.5-2-2"/>
-            <path d="m14.5 14.5 2 2"/>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <circle cx="12" cy="12" r="3" />
+            <path d="m14.5 9.5 2-2" />
+            <path d="m9.5 14.5-2 2" />
+            <path d="m9.5 9.5-2-2" />
+            <path d="m14.5 14.5 2 2" />
           </svg>
         </div>
         <div>
@@ -28,30 +29,21 @@
 
         <!-- Language Switcher Selector -->
         <div class="lang-selector-group" role="group" [attr.aria-label]="'LANGUAGE' | translate">
-          <button 
-            type="button"
-            class="lang-btn" 
-            [class.active]="i18n.isSpanish()" 
-            (click)="setLanguage('es')"
-            id="lang-btn-es"
-            title="Cambiar a Español">
+          <button type="button" class="lang-btn" [class.active]="i18n.isSpanish()" (click)="setLanguage('es')"
+            id="lang-btn-es" title="Cambiar a Español">
             🇪🇸 ES
           </button>
-          <button 
-            type="button"
-            class="lang-btn" 
-            [class.active]="i18n.isEnglish()" 
-            (click)="setLanguage('en')"
-            id="lang-btn-en"
-            title="Switch to English">
+          <button type="button" class="lang-btn" [class.active]="i18n.isEnglish()" (click)="setLanguage('en')"
+            id="lang-btn-en" title="Switch to English">
             🇺🇸 EN
           </button>
         </div>
 
         <!-- Refresh Button -->
         <button type="button" class="btn-secondary" (click)="loadData()" [disabled]="isLoading()" id="refresh-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" [class.spinning]="isLoading()">
-            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            [class.spinning]="isLoading()">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
           </svg>
           <span>{{ 'REFRESH' | translate }}</span>
         </button>
@@ -101,15 +93,16 @@
         <div class="kpi-card card-total">
           <div class="kpi-icon-wrapper icon-total">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
             </svg>
           </div>
           <div class="kpi-content">
             <span class="kpi-label">{{ 'TOTAL_DEPOSITS' | translate }}</span>
             <span class="kpi-value">{{ dashboard().totalDeposits }}</span>
             <span class="kpi-meta">
-              {{ 'TOTAL_EXPECTED' | translate }}: {{ dashboard().totalExpectedAmount | currency:'USD':'symbol':'1.2-2' }}
+              {{ 'TOTAL_EXPECTED' | translate }}: {{ dashboard().totalExpectedAmount | currency:'USD':'symbol':'1.2-2'
+              }}
             </span>
           </div>
         </div>
@@ -118,8 +111,8 @@
         <div class="kpi-card card-reconciled">
           <div class="kpi-icon-wrapper icon-reconciled">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
           </div>
           <div class="kpi-content">
@@ -135,8 +128,8 @@
         <div class="kpi-card card-short">
           <div class="kpi-icon-wrapper icon-short">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
-              <polyline points="17 18 23 18 23 12"/>
+              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
+              <polyline points="17 18 23 18 23 12" />
             </svg>
           </div>
           <div class="kpi-content">
@@ -150,8 +143,8 @@
         <div class="kpi-card card-over">
           <div class="kpi-icon-wrapper icon-over">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-              <polyline points="17 6 23 6 23 12"/>
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
             </svg>
           </div>
           <div class="kpi-content">
@@ -165,20 +158,20 @@
         <div class="kpi-card card-variance">
           <div class="kpi-icon-wrapper icon-variance">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" x2="12" y2="12"/>
-              <line x1="12" y1="16" x2="12.01" y2="16"/>
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
           </div>
           <div class="kpi-content">
             <span class="kpi-label">{{ 'TOTAL_VARIANCE' | translate }}</span>
-            <span class="kpi-value" 
-              [ngClass]="{
+            <span class="kpi-value" [ngClass]="{
                 'text-short': dashboard().totalVariance < 0,
                 'text-over': dashboard().totalVariance > 0,
                 'text-reconciled': dashboard().totalVariance === 0
               }">
-              {{ dashboard().totalVariance >= 0 ? '+' : '' }}{{ dashboard().totalVariance | currency:'USD':'symbol':'1.2-2' }}
+              {{ dashboard().totalVariance >= 0 ? '+' : '' }}{{ dashboard().totalVariance |
+              currency:'USD':'symbol':'1.2-2' }}
             </span>
             <span class="kpi-meta">
               {{ 'TOTAL_ACTUAL' | translate }}: {{ dashboard().totalActualAmount | currency:'USD':'symbol':'1.2-2' }}
@@ -193,7 +186,7 @@
       <div class="filters-header">
         <div class="filters-title-group">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
           </svg>
           <h3>{{ 'SEARCH_FILTERS' | translate }}</h3>
         </div>
@@ -203,34 +196,21 @@
         <!-- Deposit Number -->
         <div class="filter-field">
           <label for="filter-deposit-no">{{ 'DEPOSIT_NUMBER' | translate }}</label>
-          <input 
-            type="text" 
-            id="filter-deposit-no" 
-            name="filterDepositNumber" 
-            [(ngModel)]="filterDepositNumber" 
-            placeholder="ej. DEP1001"
-            class="input-control">
+          <input type="text" id="filter-deposit-no" name="filterDepositNumber" [(ngModel)]="filterDepositNumber"
+            placeholder="ej. DEP1001" class="input-control">
         </div>
 
         <!-- Store Number -->
         <div class="filter-field">
           <label for="filter-store-no">{{ 'STORE_NUMBER' | translate }}</label>
-          <input 
-            type="text" 
-            id="filter-store-no" 
-            name="filterStoreNumber" 
-            [(ngModel)]="filterStoreNumber" 
-            placeholder="ej. ST001"
-            class="input-control">
+          <input type="text" id="filter-store-no" name="filterStoreNumber" [(ngModel)]="filterStoreNumber"
+            placeholder="ej. ST001" class="input-control">
         </div>
 
         <!-- Status -->
         <div class="filter-field">
           <label for="filter-status">{{ 'STATUS' | translate }}</label>
-          <select 
-            id="filter-status" 
-            name="filterStatus" 
-            [(ngModel)]="filterStatus" 
+          <select id="filter-status" name="filterStatus" [(ngModel)]="filterStatus"
             class="input-control select-control">
             <option value="">{{ 'ALL_STATUSES' | translate }}</option>
             <option value="Pending">{{ 'STATUS_PENDING' | translate }}</option>
@@ -243,22 +223,14 @@
         <!-- Date From -->
         <div class="filter-field">
           <label for="filter-start-date">{{ 'DATE_FROM' | translate }}</label>
-          <input 
-            type="date" 
-            id="filter-start-date" 
-            name="filterStartDate" 
-            [(ngModel)]="filterStartDate" 
+          <input type="date" id="filter-start-date" name="filterStartDate" [(ngModel)]="filterStartDate"
             class="input-control">
         </div>
 
         <!-- Date To -->
         <div class="filter-field">
           <label for="filter-end-date">{{ 'DATE_TO' | translate }}</label>
-          <input 
-            type="date" 
-            id="filter-end-date" 
-            name="filterEndDate" 
-            [(ngModel)]="filterEndDate" 
+          <input type="date" id="filter-end-date" name="filterEndDate" [(ngModel)]="filterEndDate"
             class="input-control">
         </div>
 
@@ -337,9 +309,7 @@
 
               <!-- Variance -->
               <td class="text-right amount-cell">
-                <span *ngIf="item.variance !== null" 
-                  class="variance-val"
-                  [ngClass]="{
+                <span *ngIf="item.variance !== null" class="variance-val" [ngClass]="{
                     'text-reconciled': item.variance === 0,
                     'text-over': item.variance > 0,
                     'text-short': item.variance < 0
@@ -359,26 +329,24 @@
 
               <!-- Actions -->
               <td class="text-center">
-                <button 
-                  type="button" 
-                  class="btn-reconcile-action" 
-                  [ngClass]="{'btn-re-reconcile': item.status !== 'Pending'}"
-                  (click)="openReconcileModal(item)"
+                <button type="button" class="btn-reconcile-action"
+                  [ngClass]="{'btn-re-reconcile': item.status !== 'Pending'}" (click)="openReconcileModal(item)"
                   [id]="'reconcile-btn-' + item.depositId"
                   [title]="item.status === 'Pending' ? ('RECONCILE_BTN' | translate) : ('RE_RECONCILE_BTN' | translate)">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <rect x="4" y="2" width="16" height="20" rx="2"/>
-                    <line x1="8" y1="6" x2="16" y2="6"/>
-                    <line x1="16" y1="14" x2="16" y2="18"/>
-                    <path d="M16 10h.01"/>
-                    <path d="M12 10h.01"/>
-                    <path d="M8 10h.01"/>
-                    <path d="M12 14h.01"/>
-                    <path d="M8 14h.01"/>
-                    <path d="M12 18h.01"/>
-                    <path d="M8 18h.01"/>
+                    <rect x="4" y="2" width="16" height="20" rx="2" />
+                    <line x1="8" y1="6" x2="16" y2="6" />
+                    <line x1="16" y1="14" x2="16" y2="18" />
+                    <path d="M16 10h.01" />
+                    <path d="M12 10h.01" />
+                    <path d="M8 10h.01" />
+                    <path d="M12 14h.01" />
+                    <path d="M8 14h.01" />
+                    <path d="M12 18h.01" />
+                    <path d="M8 18h.01" />
                   </svg>
-                  <span>{{ item.status === 'Pending' ? ('RECONCILE_BTN' | translate) : ('RE_RECONCILE_BTN' | translate) }}</span>
+                  <span>{{ item.status === 'Pending' ? ('RECONCILE_BTN' | translate) : ('RE_RECONCILE_BTN' | translate)
+                    }}</span>
                 </button>
               </td>
             </tr>
@@ -410,8 +378,8 @@
         <div class="modal-title-wrap">
           <div class="modal-icon-badge">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
             </svg>
           </div>
           <div>
@@ -428,14 +396,11 @@
           <label for="new-deposit-number" class="form-label">
             {{ 'FIELD_DEPOSIT_NUMBER' | translate }} <span class="required-star">*</span>
           </label>
-          <input 
-            type="text" 
-            id="new-deposit-number" 
-            formControlName="depositNumber" 
-            placeholder="ej. DEP2001"
+          <input type="text" id="new-deposit-number" formControlName="depositNumber" placeholder="ej. DEP2001"
             class="input-control"
             [class.input-invalid]="createForm.get('depositNumber')?.invalid && createForm.get('depositNumber')?.touched">
-          <div class="field-error" *ngIf="createForm.get('depositNumber')?.invalid && createForm.get('depositNumber')?.touched">
+          <div class="field-error"
+            *ngIf="createForm.get('depositNumber')?.invalid && createForm.get('depositNumber')?.touched">
             {{ 'ERR_DEPOSIT_NO_REQUIRED' | translate }}
           </div>
         </div>
@@ -445,14 +410,11 @@
           <label for="new-store-number" class="form-label">
             {{ 'FIELD_STORE_NUMBER' | translate }} <span class="required-star">*</span>
           </label>
-          <input 
-            type="text" 
-            id="new-store-number" 
-            formControlName="storeNumber" 
-            placeholder="ej. ST102"
+          <input type="text" id="new-store-number" formControlName="storeNumber" placeholder="ej. ST102"
             class="input-control"
             [class.input-invalid]="createForm.get('storeNumber')?.invalid && createForm.get('storeNumber')?.touched">
-          <div class="field-error" *ngIf="createForm.get('storeNumber')?.invalid && createForm.get('storeNumber')?.touched">
+          <div class="field-error"
+            *ngIf="createForm.get('storeNumber')?.invalid && createForm.get('storeNumber')?.touched">
             {{ 'ERR_STORE_NO_REQUIRED' | translate }}
           </div>
         </div>
@@ -463,16 +425,11 @@
             <label for="new-expected-amount" class="form-label">
               {{ 'FIELD_EXPECTED_AMOUNT' | translate }} ($) <span class="required-star">*</span>
             </label>
-            <input 
-              type="number" 
-              step="0.01" 
-              min="0.01"
-              id="new-expected-amount" 
-              formControlName="expectedAmount" 
-              placeholder="0.00"
-              class="input-control"
+            <input type="number" step="0.01" min="0.01" id="new-expected-amount" formControlName="expectedAmount"
+              placeholder="0.00" class="input-control"
               [class.input-invalid]="createForm.get('expectedAmount')?.invalid && createForm.get('expectedAmount')?.touched">
-            <div class="field-error" *ngIf="createForm.get('expectedAmount')?.invalid && createForm.get('expectedAmount')?.touched">
+            <div class="field-error"
+              *ngIf="createForm.get('expectedAmount')?.invalid && createForm.get('expectedAmount')?.touched">
               {{ 'ERR_EXPECTED_REQUIRED' | translate }}
             </div>
           </div>
@@ -482,13 +439,10 @@
             <label for="new-deposit-date" class="form-label">
               {{ 'FIELD_DEPOSIT_DATE' | translate }} <span class="required-star">*</span>
             </label>
-            <input 
-              type="date" 
-              id="new-deposit-date" 
-              formControlName="depositDate" 
-              class="input-control"
+            <input type="date" id="new-deposit-date" formControlName="depositDate" class="input-control"
               [class.input-invalid]="createForm.get('depositDate')?.invalid && createForm.get('depositDate')?.touched">
-            <div class="field-error" *ngIf="createForm.get('depositDate')?.invalid && createForm.get('depositDate')?.touched">
+            <div class="field-error"
+              *ngIf="createForm.get('depositDate')?.invalid && createForm.get('depositDate')?.touched">
               {{ 'ERR_DATE_REQUIRED' | translate }}
             </div>
           </div>
@@ -515,8 +469,8 @@
         <div class="modal-title-wrap">
           <div class="modal-icon-badge badge-reconcile-modal">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 1v22"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              <path d="M12 1v22" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
             </svg>
           </div>
           <div>
@@ -554,22 +508,16 @@
             </label>
             <div class="currency-input-wrap">
               <span class="currency-prefix">$</span>
-              <input 
-                type="number" 
-                step="0.01" 
-                min="0"
-                id="reconcile-actual-amount" 
-                formControlName="actualAmount" 
-                (input)="onActualAmountInput($event)"
-                placeholder="0.00"
-                autofocus
-                class="input-control input-amount-lg"
+              <input type="number" step="1" min="0" id="reconcile-actual-amount" formControlName="actualAmount"
+                (input)="onActualAmountInput($event)" placeholder="0.00" autofocus class="input-control input-amount-lg"
                 [class.input-invalid]="reconcileForm.get('actualAmount')?.invalid && reconcileForm.get('actualAmount')?.touched">
             </div>
-            <div class="field-error" *ngIf="reconcileForm.get('actualAmount')?.hasError('required') && reconcileForm.get('actualAmount')?.touched">
+            <div class="field-error"
+              *ngIf="reconcileForm.get('actualAmount')?.hasError('required') && reconcileForm.get('actualAmount')?.touched">
               {{ 'ERR_ACTUAL_REQUIRED' | translate }}
             </div>
-            <div class="field-error" *ngIf="reconcileForm.get('actualAmount')?.hasError('min') && reconcileForm.get('actualAmount')?.touched">
+            <div class="field-error"
+              *ngIf="reconcileForm.get('actualAmount')?.hasError('min') && reconcileForm.get('actualAmount')?.touched">
               {{ 'ERR_ACTUAL_NEGATIVE' | translate }}
             </div>
           </div>
@@ -578,8 +526,7 @@
           <div class="reconciliation-preview-card" *ngIf="liveVariance() !== null">
             <div class="preview-row">
               <span class="preview-label">{{ 'CALCULATED_VARIANCE' | translate }}:</span>
-              <span class="preview-variance-badge" 
-                [ngClass]="{
+              <span class="preview-variance-badge" [ngClass]="{
                   'text-reconciled': liveVariance() === 0,
                   'text-over': liveVariance()! > 0,
                   'text-short': liveVariance()! < 0
@@ -613,7 +560,7 @@
             </button>
             <button type="submit" class="btn-primary btn-confirm-reconcile" [disabled]="reconcileForm.invalid">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="20 6 9 17 4 12"/>
+                <polyline points="20 6 9 17 4 12" />
               </svg>
               <span>{{ 'CONFIRM_RECONCILE_BTN' | translate }}</span>
             </button>

@@ -31,7 +31,7 @@ El portal resuelve la necesidad operativa de control y auditoría de ingresos de
 * **Auditoría Automatizada**: Clasificación inmediata en estados *Conciliado*, *Sobrante* o *Faltante* según la diferencia detectada.
 * **Panel de Control (Dashboard)**: Métricas consolidadas en tiempo real (total de depósitos, pendientes, conciliados, faltantes, sobrantes y varianza acumulada).
 * **Búsqueda Avanzada y Filtros**: Búsqueda por número de depósito, número de tienda, estado y rango de fechas.
-* **Experiencia de Usuario Premium**: Interfaz en modo oscuro con *glassmorphism*, micro-animaciones, diseño completamente responsivo y cambio de idioma en caliente (ES/EN).
+* **Experiencia de Usuario Premium**: Interfaz moderna en tema claro (*light theme*) con *glassmorphism*, micro-animaciones, diseño completamente responsivo y cambio de idioma en caliente (ES/EN).
 
 ---
 
@@ -44,7 +44,7 @@ El portal resuelve la necesidad operativa de control y auditoría de ingresos de
 | **Base de Datos** | Microsoft SQL Server / Express | 2019/2022 | Almacén relacional con restricciones e índices optimizados |
 | **Documentación API** | Swagger / OpenAPI | Swashbuckle 6.6.2 | Especificación interactiva de endpoints |
 | **Frontend Web** | Angular | 19.1 | SPA con Standalone Components, Signals y Reactive Forms |
-| **Estilos** | CSS3 Moderno | Custom tokens | Variables CSS, Glassmorphism, temas oscuros y animaciones fluidas |
+| **Estilos** | CSS3 Moderno | Custom tokens | Variables CSS, Glassmorphism, tema claro (*light theme*) y animaciones fluidas |
 | **Testing Backend** | xUnit & Moq | 2.9 / 4.21 | Pruebas unitarias de servicios de negocio y lógica de conciliación |
 | **Testing Frontend** | Jasmine & Karma | 5.5 / 6.4 | Pruebas unitarias de componentes, reactividad y traducciones |
 

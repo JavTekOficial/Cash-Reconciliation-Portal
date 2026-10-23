@@ -2,56 +2,58 @@
   --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-heading: 'Outfit', sans-serif;
 
-  /* Rich Color Palette */
-  --bg-dark: #090d16;
-  --bg-card: #111726;
-  --bg-card-glass: rgba(17, 23, 38, 0.82);
-  --bg-surface: #1a2236;
-  --bg-surface-hover: #222d45;
+  /* Rich Color Palette - Light Theme */
+  --bg-dark: #e6ebf0;
+  --bg-card: #ffffff;
+  --bg-card-glass: rgba(255, 255, 255, 0.9);
+  --bg-surface: #f1f5f9;
+  --bg-surface-hover: #e2e8f0;
 
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-card: rgba(255, 255, 255, 0.12);
-  --border-highlight: rgba(99, 102, 241, 0.4);
+  --border-subtle: #e2e8f0;
+  --border-card: #cbd5e1;
+  --border-highlight: rgba(79, 70, 229, 0.35);
 
-  --text-main: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-inverse: #0b0f19;
+  --text-main: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-inverse: #ffffff;
 
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --primary-glow: rgba(99, 102, 241, 0.25);
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-glow: rgba(79, 70, 229, 0.18);
 
-  /* Status Colors */
-  --status-pending: #f59e0b;
-  --status-pending-bg: rgba(245, 158, 11, 0.14);
-  --status-pending-border: rgba(245, 158, 11, 0.3);
+  /* Status Colors (Optimized for High Legibility on Light Mode) */
+  --status-pending: #b45309;
+  --status-pending-bg: #fef3c7;
+  --status-pending-border: #fde68a;
 
-  --status-reconciled: #10b981;
-  --status-reconciled-bg: rgba(16, 185, 129, 0.14);
-  --status-reconciled-border: rgba(16, 185, 129, 0.3);
+  --status-reconciled: #047857;
+  --status-reconciled-bg: #d1fae5;
+  --status-reconciled-border: #a7f3d0;
 
-  --status-over: #06b6d4;
-  --status-over-bg: rgba(6, 182, 212, 0.14);
-  --status-over-border: rgba(6, 182, 212, 0.3);
+  --status-over: #0369a1;
+  --status-over-bg: #e0f2fe;
+  --status-over-border: #bae6fd;
 
-  --status-short: #f43f5e;
-  --status-short-bg: rgba(244, 63, 94, 0.14);
-  --status-short-border: rgba(244, 63, 94, 0.3);
+  --status-short: #be123c;
+  --status-short-bg: #ffe4e6;
+  --status-short-border: #fecdd3;
 
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.55);
-  --shadow-card: 0 4px 24px -1px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 16px -2px rgba(0, 0, 0, 0.05);
   --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -65,9 +67,10 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.18), transparent 70%),
-    radial-gradient(circle 600px at 100% 100%, rgba(6, 182, 212, 0.08), transparent 60%);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.07), transparent 70%),
+    radial-gradient(circle 800px at 100% 100%, rgba(6, 182, 212, 0.05), transparent 60%),
+    radial-gradient(circle 600px at 0% 50%, rgba(245, 158, 11, 0.03), transparent 60%);
   background-attachment: fixed;
 }
 
@@ -79,7 +82,9 @@ button {
   outline: none;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   font-family: inherit;
   color: inherit;
 }
@@ -91,14 +96,14 @@ input, select, textarea {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-dark);
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: #94a3b8;
 }
