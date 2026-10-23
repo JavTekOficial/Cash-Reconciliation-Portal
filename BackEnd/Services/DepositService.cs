@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text;
 using CashReconciliation.Api.DTOs;
 using CashReconciliation.Api.Models;
 using CashReconciliation.Api.Repositories;
@@ -137,6 +139,48 @@ public class DepositService : IDepositService
     {
         var logs = await _repository.GetAuditLogsByDepositIdAsync(depositId, cancellationToken);
         return logs.Select(MapAuditLogToDto);
+    }
+
+    public async Task<byte[]> ExportDepositsToCsvAsync(DepositFilterParams filters, CancellationToken cancellationToken = default)
+    {
+        var deposits = await _repository.GetAllAsync(filters, cancellationToken);
+
+        var builder = new StringBuilder();
+        builder.AppendLine("Deposit Number,Store Number,Deposit Date,Expected Amount,Actual Amount,Variance,Status,Reconciled At,Created At");
+
+        foreach (var d in deposits)
+        {
+            var depositNo = EscapeCsv(d.DepositNumber);
+            var storeNo = EscapeCsv(d.StoreNumber);
+            var depositDate = d.DepositDate.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            var expected = d.ExpectedAmount.ToString("F2", CultureInfo.InvariantCulture);
+            var actual = d.ActualAmount.HasValue ? d.ActualAmount.Value.ToString("F2", CultureInfo.InvariantCulture) : "";
+            var variance = d.Variance.HasValue ? d.Variance.Value.ToString("F2", CultureInfo.InvariantCulture) : "";
+            var status = EscapeCsv(d.Status);
+            var reconciledAt = d.ReconciledAt.HasValue ? d.ReconciledAt.Value.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) : "";
+            var createdAt = d.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+
+            builder.AppendLine($"{depositNo},{storeNo},{depositDate},{expected},{actual},{variance},{status},{reconciledAt},{createdAt}");
+        }
+
+        var preamble = Encoding.UTF8.GetPreamble();
+        var bytes = Encoding.UTF8.GetBytes(builder.ToString());
+
+        var result = new byte[preamble.Length + bytes.Length];
+        Buffer.BlockCopy(preamble, 0, result, 0, preamble.Length);
+        Buffer.BlockCopy(bytes, 0, result, preamble.Length, bytes.Length);
+
+        return result;
+    }
+
+    private static string EscapeCsv(string? value)
+    {
+        if (string.IsNullOrEmpty(value)) return "";
+        if (value.Contains(',') || value.Contains('"') || value.Contains('\n') || value.Contains('\r'))
+        {
+            return $"\"{value.Replace("\"", "\"\"")}\"";
+        }
+        return value;
     }
 
     private static DepositDto MapToDto(Deposit entity) => new()

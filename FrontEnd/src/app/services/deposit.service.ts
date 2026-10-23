@@ -44,6 +44,33 @@ export class DepositService {
     return this.http.get<DepositAuditLog[]>(`${this.baseUrl}/${depositId}/audit-logs`);
   }
 
+  exportDepositsToCsv(filters?: DepositFilter): Observable<Blob> {
+    let params = new HttpParams();
+
+    if (filters) {
+      if (filters.depositNumber?.trim()) {
+        params = params.set('depositNumber', filters.depositNumber.trim());
+      }
+      if (filters.storeNumber?.trim()) {
+        params = params.set('storeNumber', filters.storeNumber.trim());
+      }
+      if (filters.status?.trim()) {
+        params = params.set('status', filters.status.trim());
+      }
+      if (filters.startDate) {
+        params = params.set('startDate', filters.startDate);
+      }
+      if (filters.endDate) {
+        params = params.set('endDate', filters.endDate);
+      }
+    }
+
+    return this.http.get(`${this.baseUrl}/export`, {
+      params,
+      responseType: 'blob'
+    });
+  }
+
   createDeposit(deposit: CreateDepositRequest): Observable<Deposit> {
     return this.http.post<Deposit>(this.baseUrl, deposit);
   }

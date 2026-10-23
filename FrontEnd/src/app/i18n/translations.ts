@@ -109,7 +109,12 @@ export const TRANSLATIONS: Record<SupportedLang, Record<string, string>> = {
     'AUDIT_PREVIOUS': 'Anterior',
     'AUDIT_NEW': 'Nuevo',
     'AUDIT_NOTES': 'Detalle / Observaciones',
-    'AUDIT_TIMESTAMP': 'Fecha y Hora'
+    'AUDIT_TIMESTAMP': 'Fecha y Hora',
+
+    // CSV Export
+    'EXPORT_CSV_BTN': 'Exportar CSV',
+    'EXPORTING': 'Generando CSV...',
+    'SUCCESS_EXPORT': 'Archivo CSV generado y descargado exitosamente.'
   },
   en: {
     // Header & Brand
@@ -219,6 +224,11 @@ export const TRANSLATIONS: Record<SupportedLang, Record<string, string>> = {
     'AUDIT_PREVIOUS': 'Previous',
     'AUDIT_NEW': 'New',
     'AUDIT_NOTES': 'Notes / Details',
-    'AUDIT_TIMESTAMP': 'Timestamp'
+    'AUDIT_TIMESTAMP': 'Timestamp',
+
+    // CSV Export
+    'EXPORT_CSV_BTN': 'Export CSV',
+    'EXPORTING': 'Generating CSV...',
+    'SUCCESS_EXPORT': 'CSV file generated and downloaded successfully.'
   }
 };

@@ -246,6 +246,17 @@
           <button type="button" class="btn-secondary btn-clear" (click)="clearFilters()" id="btn-clear-filters">
             <span>{{ 'CLEAR_BTN' | translate }}</span>
           </button>
+          <button type="button" class="btn-export-csv" (click)="exportToCsv()" [disabled]="isExporting() || isLoading()"
+            id="btn-export-csv" [title]="'EXPORT_CSV_BTN' | translate">
+            <svg *ngIf="!isExporting()" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span *ngIf="isExporting()" class="spinner-tiny"></span>
+            <span>{{ (isExporting() ? 'EXPORTING' : 'EXPORT_CSV_BTN') | translate }}</span>
+          </button>
         </div>
       </form>
     </section>
@@ -334,7 +345,8 @@
                     [ngClass]="{'btn-re-reconcile': item.status !== 'Pending'}" (click)="openReconcileModal(item)"
                     [id]="'reconcile-btn-' + item.depositId"
                     [title]="item.status === 'Pending' ? ('RECONCILE_BTN' | translate) : ('RE_RECONCILE_BTN' | translate)">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2.2">
                       <rect x="4" y="2" width="16" height="20" rx="2" />
                       <line x1="8" y1="6" x2="16" y2="6" />
                       <line x1="16" y1="14" x2="16" y2="18" />
@@ -346,13 +358,13 @@
                       <path d="M12 18h.01" />
                       <path d="M8 18h.01" />
                     </svg>
-                    <span>{{ item.status === 'Pending' ? ('RECONCILE_BTN' | translate) : ('RE_RECONCILE_BTN' | translate)
+                    <span>{{ item.status === 'Pending' ? ('RECONCILE_BTN' | translate) : ('RE_RECONCILE_BTN' |
+                      translate)
                       }}</span>
                   </button>
 
                   <button type="button" class="btn-audit-action" (click)="openAuditModal(item)"
-                    [id]="'audit-btn-' + item.depositId"
-                    [title]="'AUDIT_TRAIL_BTN' | translate">
+                    [id]="'audit-btn-' + item.depositId" [title]="'AUDIT_TRAIL_BTN' | translate">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <circle cx="12" cy="12" r="10"></circle>
                       <polyline points="12 6 12 12 16 14"></polyline>
@@ -420,7 +432,8 @@
             <span class="kpi-label">{{ 'TOTAL_DEPOSITS' | translate }} ({{ 'RESULTS' | translate }})</span>
             <span class="kpi-value">{{ filteredSummary().totalDeposits }}</span>
             <span class="kpi-meta">
-              {{ 'TOTAL_EXPECTED' | translate }}: {{ filteredSummary().totalExpectedAmount | currency:'USD':'symbol':'1.2-2' }}
+              {{ 'TOTAL_EXPECTED' | translate }}: {{ filteredSummary().totalExpectedAmount |
+              currency:'USD':'symbol':'1.2-2' }}
             </span>
           </div>
         </div>
@@ -492,7 +505,8 @@
               currency:'USD':'symbol':'1.2-2' }}
             </span>
             <span class="kpi-meta">
-              {{ 'TOTAL_ACTUAL' | translate }}: {{ filteredSummary().totalActualAmount | currency:'USD':'symbol':'1.2-2' }}
+              {{ 'TOTAL_ACTUAL' | translate }}: {{ filteredSummary().totalActualAmount | currency:'USD':'symbol':'1.2-2'
+              }}
             </span>
           </div>
         </div>
@@ -797,7 +811,8 @@
                 <div class="change-box">
                   <span class="change-label">{{ 'STATUS' | translate }}</span>
                   <div class="change-values">
-                    <span class="status-badge status-badge-sm" [ngClass]="getStatusClass(log.previousStatus || 'Pending')">
+                    <span class="status-badge status-badge-sm"
+                      [ngClass]="getStatusClass(log.previousStatus || 'Pending')">
                       {{ getStatusTranslationKey(log.previousStatus || 'Pending') | translate }}
                     </span>
                     <span class="arrow-indicator">➔</span>
@@ -810,23 +825,27 @@
                 <div class="change-box">
                   <span class="change-label">{{ 'TABLE_ACTUAL' | translate }}</span>
                   <div class="change-values">
-                    <span class="val-prev">{{ log.previousActualAmount !== null ? (log.previousActualAmount | currency:'USD':'symbol':'1.2-2') : '—' }}</span>
+                    <span class="val-prev">{{ log.previousActualAmount !== null ? (log.previousActualAmount |
+                      currency:'USD':'symbol':'1.2-2') : '—' }}</span>
                     <span class="arrow-indicator">➔</span>
-                    <span class="val-new font-semibold">{{ log.newActualAmount !== null ? (log.newActualAmount | currency:'USD':'symbol':'1.2-2') : '—' }}</span>
+                    <span class="val-new font-semibold">{{ log.newActualAmount !== null ? (log.newActualAmount |
+                      currency:'USD':'symbol':'1.2-2') : '—' }}</span>
                   </div>
                 </div>
 
                 <div class="change-box">
                   <span class="change-label">{{ 'TABLE_VARIANCE' | translate }}</span>
                   <div class="change-values">
-                    <span class="val-prev">{{ log.previousVariance !== null ? ((log.previousVariance >= 0 ? '+' : '') + (log.previousVariance | currency:'USD':'symbol':'1.2-2')) : '—' }}</span>
+                    <span class="val-prev">{{ log.previousVariance !== null ? ((log.previousVariance >= 0 ? '+' : '') +
+                      (log.previousVariance | currency:'USD':'symbol':'1.2-2')) : '—' }}</span>
                     <span class="arrow-indicator">➔</span>
                     <span class="val-new font-semibold" [ngClass]="{
                       'text-reconciled': log.newVariance === 0,
                       'text-over': log.newVariance !== null && log.newVariance > 0,
                       'text-short': log.newVariance !== null && log.newVariance < 0
                     }">
-                      {{ log.newVariance !== null ? ((log.newVariance >= 0 ? '+' : '') + (log.newVariance | currency:'USD':'symbol':'1.2-2')) : '—' }}
+                      {{ log.newVariance !== null ? ((log.newVariance >= 0 ? '+' : '') + (log.newVariance |
+                      currency:'USD':'symbol':'1.2-2')) : '—' }}
                     </span>
                   </div>
                 </div>

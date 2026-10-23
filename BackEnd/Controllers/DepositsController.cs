@@ -30,6 +30,19 @@ public class DepositsController : ControllerBase
     }
 
     /// <summary>
+    /// Exports deposits matching search filters as a CSV file with UTF-8 BOM encoding.
+    /// </summary>
+    [HttpGet("export")]
+    [Produces("text/csv")]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Export([FromQuery] DepositFilterParams filters, CancellationToken cancellationToken)
+    {
+        var csvBytes = await _depositService.ExportDepositsToCsvAsync(filters, cancellationToken);
+        var fileName = $"deposits_export_{DateTime.UtcNow:yyyyMMdd_HHmmss}.csv";
+        return File(csvBytes, "text/csv; charset=utf-8", fileName);
+    }
+
+    /// <summary>
     /// Retrieves a specific deposit by ID.
     /// </summary>
     [HttpGet("{id:int}")]

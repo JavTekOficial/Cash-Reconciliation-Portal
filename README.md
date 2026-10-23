@@ -188,6 +188,7 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
 | `GET` | `/api/deposits` | Listado paginado/filtrado de depósitos | `200 OK` |
 | `GET` | `/api/deposits/{id}` | Obtener detalle de un depósito por su ID | `200 OK`, `404 Not Found` |
 | `GET` | `/api/deposits/{id}/audit-logs` | Historial cronológico de auditoría (*Audit Trail*) | `200 OK`, `404 Not Found` |
+| `GET` | `/api/deposits/export` | Exportar resultados de búsqueda a archivo CSV (UTF-8 BOM) | `200 OK` |
 | `POST` | `/api/deposits` | Registrar un nuevo depósito en bóveda | `201 Created`, `400 Bad Request` |
 | `PUT` | `/api/deposits/{id}/reconcile` | Conciliar depósito ingresando monto real | `200 OK`, `400 Bad Request`, `404 Not Found` |
 | `GET` | `/api/dashboard` | Métricas consolidadas del dashboard (soporta filtros de búsqueda) | `200 OK` |
@@ -286,7 +287,20 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
 ]
 ```
 
-#### 4. Resumen de Dashboard (`GET /api/dashboard`)
+#### 4. Exportar a CSV (`GET /api/deposits/export`)
+**Headers:**
+```http
+Content-Type: text/csv; charset=utf-8
+Content-Disposition: attachment; filename="deposits_export_20261023_170000.csv"
+```
+**Response Body (UTF-8 BOM con cabeceras y registros filtrados):**
+```csv
+Deposit Number,Store Number,Deposit Date,Expected Amount,Actual Amount,Variance,Status,Reconciled At,Created At
+DEP1001,ST001,2026-10-23 04:00:00,5000.00,5000.00,0.00,Reconciled,2026-10-23 04:30:00,2026-10-23 04:00:00
+DEP1002,ST002,2026-10-23 04:00:00,4250.00,,,Pending,,2026-10-23 04:00:00
+```
+
+#### 5. Resumen de Dashboard (`GET /api/dashboard`)
 **Response (`200 OK`):**
 ```json
 {
@@ -306,7 +320,7 @@ Antes de ejecutar la aplicación, asegúrese de tener instalado:
 ## Ejecución de Pruebas Automatizadas
 
 ### Pruebas Unitarias del Backend (xUnit + Moq)
-El proyecto [BackEnd.Tests](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/BackEnd.Tests) contiene 12 pruebas unitarias exhaustivas para la capa de servicios, reglas de conciliación y registro de auditoría:
+El proyecto [BackEnd.Tests](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/BackEnd.Tests) contiene 13 pruebas unitarias exhaustivas para la capa de servicios, reglas de conciliación, auditoría y exportación:
 ```powershell
 dotnet test BackEnd.Tests/BackEnd.Tests.csproj
 ```
@@ -322,9 +336,10 @@ dotnet test BackEnd.Tests/BackEnd.Tests.csproj
 * Conciliación inicial registra evento de auditoría (`Action = "Reconciled"`).
 * Re-conciliación subsecuente registra evento de auditoría (`Action = "Re-Reconciled"`) capturando valores previos.
 * Obtención de registros de auditoría por depósito mapeados a DTOs.
+* Exportación a CSV con codificación UTF-8 BOM, cabeceras normalizadas y escapado de caracteres especiales.
 
 ### Pruebas Unitarias del Frontend (Angular + Jasmine)
-El proyecto [FrontEnd](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/FrontEnd) incluye 13 pruebas unitarias exhaustivas:
+El proyecto [FrontEnd](file:///c:/Users/Javie/Otros/Proyectos/Cash%20Reconciliation%20Portal/FrontEnd) incluye 15 pruebas unitarias exhaustivas:
 ```powershell
 cd FrontEnd
 npm test -- --watch=false --browsers=ChromeHeadless
@@ -411,4 +426,5 @@ Para garantizar la máxima calidad y trazabilidad conforme a la especificación 
 5. `feat(frontend): implement dashboard, deposit table, search filters and modals`
 6. `docs: add comprehensive project documentation, test suite and setup guide`
 7. `feat(audit): implement deposit audit trail logging, rest endpoint and ui timeline`
+8. `feat(export): implement server-side csv export with active filters and frontend download`
 

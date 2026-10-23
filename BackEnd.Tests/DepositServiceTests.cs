@@ -1,3 +1,4 @@
+using System.Text;
 using CashReconciliation.Api.DTOs;
 using CashReconciliation.Api.Models;
 using CashReconciliation.Api.Repositories;
@@ -431,5 +432,66 @@ public class DepositServiceTests
         Assert.Equal("Created", result[0].Action);
         Assert.Equal(2, result[1].AuditLogId);
         Assert.Equal("Reconciled", result[1].Action);
+    }
+
+    [Fact]
+    public async Task ExportDepositsToCsvAsync_ReturnsUtf8BomAndValidCsvData()
+    {
+        // Arrange
+        var filters = new DepositFilterParams { StoreNumber = "ST001" };
+        var deposits = new List<Deposit>
+        {
+            new()
+            {
+                DepositId = 1,
+                DepositNumber = "DEP-CSV-1",
+                StoreNumber = "ST001, Main", // Needs escaping
+                DepositDate = new DateTime(2026, 10, 20, 10, 30, 0, DateTimeKind.Utc),
+                ExpectedAmount = 1500.00m,
+                ActualAmount = 1550.00m,
+                Variance = 50.00m,
+                Status = DepositStatus.Over,
+                ReconciledAt = new DateTime(2026, 10, 20, 14, 0, 0, DateTimeKind.Utc),
+                CreatedAt = new DateTime(2026, 10, 20, 8, 0, 0, DateTimeKind.Utc)
+            },
+            new()
+            {
+                DepositId = 2,
+                DepositNumber = "DEP-CSV-2",
+                StoreNumber = "ST002",
+                DepositDate = new DateTime(2026, 10, 21, 11, 0, 0, DateTimeKind.Utc),
+                ExpectedAmount = 2000.00m,
+                ActualAmount = null,
+                Variance = null,
+                Status = DepositStatus.Pending,
+                ReconciledAt = null,
+                CreatedAt = new DateTime(2026, 10, 21, 9, 0, 0, DateTimeKind.Utc)
+            }
+        };
+
+        _repositoryMock
+            .Setup(r => r.GetAllAsync(filters, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(deposits);
+
+        // Act
+        var result = await _service.ExportDepositsToCsvAsync(filters);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.True(result.Length > 3);
+
+        // Verify UTF-8 BOM preamble (0xEF, 0xBB, 0xBF)
+        Assert.Equal(0xEF, result[0]);
+        Assert.Equal(0xBB, result[1]);
+        Assert.Equal(0xBF, result[2]);
+
+        // Decode content without BOM
+        var csvString = Encoding.UTF8.GetString(result, 3, result.Length - 3);
+        var lines = csvString.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+        Assert.Equal(3, lines.Length); // Header + 2 data rows
+        Assert.Equal("Deposit Number,Store Number,Deposit Date,Expected Amount,Actual Amount,Variance,Status,Reconciled At,Created At", lines[0]);
+        Assert.Contains("DEP-CSV-1,\"ST001, Main\",2026-10-20 10:30:00,1500.00,1550.00,50.00,Over,2026-10-20 14:00:00,2026-10-20 08:00:00", lines[1]);
+        Assert.Contains("DEP-CSV-2,ST002,2026-10-21 11:00:00,2000.00,,,Pending,,2026-10-21 09:00:00", lines[2]);
     }
 }

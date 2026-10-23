@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { AppComponent } from './app.component';
 import { DepositService } from './services/deposit.service';
 import { DashboardService } from './services/dashboard.service';
@@ -52,11 +52,12 @@ describe('AppComponent', () => {
   };
 
   beforeEach(async () => {
-    depositServiceMock = jasmine.createSpyObj('DepositService', ['getDeposits', 'createDeposit', 'reconcileDeposit', 'getAuditLogs']);
+    depositServiceMock = jasmine.createSpyObj('DepositService', ['getDeposits', 'createDeposit', 'reconcileDeposit', 'getAuditLogs', 'exportDepositsToCsv']);
     dashboardServiceMock = jasmine.createSpyObj('DashboardService', ['getSummary']);
 
     depositServiceMock.getDeposits.and.returnValue(of(mockDeposits));
     depositServiceMock.getAuditLogs.and.returnValue(of([]));
+    depositServiceMock.exportDepositsToCsv.and.returnValue(of(new Blob(['test'], { type: 'text/csv' })));
     dashboardServiceMock.getSummary.and.returnValue(of(mockDashboard));
 
     await TestBed.configureTestingModule({
@@ -257,6 +258,28 @@ describe('AppComponent', () => {
       expect(component.isAuditModalOpen()).toBeFalse();
       expect(component.selectedAuditDeposit()).toBeNull();
       expect(component.auditLogs().length).toBe(0);
+    });
+  });
+
+  describe('CSV Export', () => {
+    it('should export deposits matching current filters to CSV and trigger file download', () => {
+      spyOn(window.URL, 'createObjectURL').and.returnValue('blob:test');
+      spyOn(window.URL, 'revokeObjectURL').and.callFake(() => {});
+
+      component.filterStoreNumber = 'ST001';
+      component.exportToCsv();
+
+      expect(depositServiceMock.exportDepositsToCsv).toHaveBeenCalledWith(jasmine.objectContaining({ storeNumber: 'ST001' }));
+      expect(component.isExporting()).toBeFalse();
+    });
+
+    it('should handle export error gracefully', () => {
+      depositServiceMock.exportDepositsToCsv.and.returnValue(throwError(() => new Error('Server error')));
+
+      component.exportToCsv();
+
+      expect(component.isExporting()).toBeFalse();
+      expect(component.errorMessage()).toBeTruthy();
     });
   });
 });

@@ -59,6 +59,9 @@ export class AppComponent implements OnInit {
   readonly auditLogs = signal<DepositAuditLog[]>([]);
   readonly isLoadingAudit = signal<boolean>(false);
 
+  // CSV export state
+  readonly isExporting = signal<boolean>(false);
+
   // Filter Form
   filterDepositNumber = '';
   filterStoreNumber = '';
@@ -179,6 +182,41 @@ export class AppComponent implements OnInit {
     this.filterStartDate = '';
     this.filterEndDate = '';
     this.loadData();
+  }
+
+  exportToCsv(): void {
+    if (this.isExporting()) return;
+
+    this.isExporting.set(true);
+
+    const filters: DepositFilter = {};
+    if (this.filterDepositNumber.trim()) filters.depositNumber = this.filterDepositNumber.trim();
+    if (this.filterStoreNumber.trim()) filters.storeNumber = this.filterStoreNumber.trim();
+    if (this.filterStatus.trim()) filters.status = this.filterStatus.trim();
+    if (this.filterStartDate) filters.startDate = this.filterStartDate;
+    if (this.filterEndDate) filters.endDate = this.filterEndDate;
+
+    this.depositService.exportDepositsToCsv(filters).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        a.download = `deposits_export_${timestamp}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        this.isExporting.set(false);
+        this.showToast(this.i18n.translate('SUCCESS_EXPORT'));
+      },
+      error: (err) => {
+        console.error('Error exporting deposits to CSV', err);
+        this.isExporting.set(false);
+        this.errorMessage.set(this.i18n.translate('ERROR_GENERIC'));
+      }
+    });
   }
 
   setLanguage(lang: SupportedLang): void {
