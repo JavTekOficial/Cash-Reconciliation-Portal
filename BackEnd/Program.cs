@@ -1,7 +1,14 @@
+using CashReconciliation.Api.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// Configure EF Core with SQL Server
+builder.Services.AddDbContext<CashReconciliationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configure CORS for frontend access
 builder.Services.AddCors(options =>
